@@ -4,13 +4,11 @@ import { Route, Switch } from "react-router-dom";
 import NotificationSystem from "react-notification-system";
 
 import AdminNavbar from "components/Navbars/AdminNavbar";
-import Footer from "components/Footer/Footer";
 import Sidebar from "components/Sidebar/Sidebar";
-import FixedPlugin from "components/FixedPlugin/FixedPlugin.jsx";
 
 import { style } from "variables/Variables.jsx";
 
-import routes from "routes.js";
+import routes from "routes.js"; 
 
 import image from "assets/img/sidebar-3.jpg";
 
@@ -20,8 +18,8 @@ class Admin extends Component {
     this.state = {
       _notificationSystem: null,
       image: image,
-      color: "black",
-      hasImage: true,
+      color: "orange",
+      hasImage: false,
       fixedClasses: "dropdown show-dropdown open"
     };
   }

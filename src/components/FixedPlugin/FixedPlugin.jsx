@@ -29,7 +29,7 @@ class FixedPlugin extends Component {
     super(props);
     this.state = {
       classes: "dropdown show-dropdown open",
-      bg_checked: true,
+      bg_checked: false,
       bgImage: this.props.bgImage
     };
   }
@@ -38,7 +38,7 @@ class FixedPlugin extends Component {
   };
   onChangeClick = () => {
     this.props.handleHasImage(!this.state.bg_checked);
-    this.setState({ bg_checked: !this.state.bg_checked });
+    this.setState({ bg_checked: false });
   };
   render() {
     return (
@@ -53,7 +53,7 @@ class FixedPlugin extends Component {
               <p className="pull-left">Background Image</p>
               <div className="pull-right">
                 <Toggle
-                  defaultChecked={this.state.bg_checked}
+                  defaultChecked={false}
                   onChange={this.onChangeClick}
                 />
               </div>

@@ -54,7 +54,7 @@ class Dashboard extends Component {
   render() {
     const isLoading = this.state.isLoading;
 
-    if(isLoading) {
+    if(!isLoading) {
       return (
         <div className="content">
           <Grid fluid>
