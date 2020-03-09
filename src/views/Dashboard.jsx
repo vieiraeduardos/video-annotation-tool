@@ -181,13 +181,14 @@ class Dashboard extends Component {
         </header>
         <p>
           <label>
-            Escolha o ator:
+            Escolha o ator: 
+            </label> 
             <select value={this.state.value} onChange={this.handleChange}>
               <option value="eduardo">Eduardo</option>
               <option value="arthur">Arthur</option>
               
             </select>
-          </label>
+         
         </p>
     </li>
     );
