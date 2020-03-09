@@ -1,0 +1,29 @@
+li.dev-item {
+    box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0.02);
+    border-radius: 2px;
+    padding: 20px;
+    margin-bottom: 20;
+
+}
+
+li.dev-item p {
+    box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0.02);
+    border-radius: 2px;
+    padding: 20px;
+    display: block;
+
+}
+
+
+
+.user-info strong {
+    display: block;
+    font-size: 16px;
+    color: #333;
+}
+
+.user-info span {
+    font-size: 16px;
+    color: #999;
+    margin-top: 2px;
+}

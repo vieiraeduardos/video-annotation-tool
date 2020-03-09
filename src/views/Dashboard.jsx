@@ -9,15 +9,12 @@ import Button from 'components/CustomButton/CustomButton.jsx';
 
 import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 
-function FieldGroup({ id, label, help, ...props }) {
-  return (
-    <FormGroup controlId={id}>
-      <ControlLabel>{label}</ControlLabel>
-      <FormControl {...props} />
-      {help && <HelpBlock>{help}</HelpBlock>}
-    </FormGroup>
-  );
-}
+import { StatsCard } from "components/StatsCard/StatsCard.jsx";
+
+import './Main.css';
+import './styles.css';
+
+import axios from 'axios';
 
 class Dashboard extends Component {
 
@@ -25,13 +22,30 @@ class Dashboard extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      file: ""
+      file: "",
+      annotations: [],
+      actors: []
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChangeFile = this.handleChangeFile.bind(this);
     this.fileInput = React.createRef();
 
+  }
+
+  componentDidMount() {
+    axios.get('http://34.70.159.150/actors')
+      .then(function (response) {
+        // handle success
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      });
   }
 
   play = () => {
@@ -157,7 +171,25 @@ class Dashboard extends Component {
     const isLoading = this.state.isLoading;
 
     const listAnnotations = this.state.annotations.map((annotation) =>
-      <li>ID : {annotation.person_id} START TIME: {annotation.start_time} END TIME: {annotation.end_time}</li>
+
+    <li className="dev-item">
+        <header>
+            <div className="user-info">
+                <strong>ID : {annotation.person_id}</strong>
+                <span>Começo: {annotation.start_time} Término: {annotation.end_time}</span>
+            </div>
+        </header>
+        <p>
+          <label>
+            Escolha o ator:
+            <select value={this.state.value} onChange={this.handleChange}>
+              <option value="eduardo">Eduardo</option>
+              <option value="arthur">Arthur</option>
+              
+            </select>
+          </label>
+        </p>
+    </li>
     );
 
     if(!isLoading) {
@@ -169,6 +201,7 @@ class Dashboard extends Component {
               <Col md={12}>
 
               <form onSubmit={this.handleSubmit}>
+                <label>Por favor, carregar vídeo para anotação.</label>
                 <input type="file" ref={this.fileInput} />
 
                 <Button bsStyle="info" pullRight fill type="submit">
@@ -189,6 +222,30 @@ class Dashboard extends Component {
       return (
         <div className="content">
           <Grid fluid>
+
+          <Row>
+            <Col lg={6} sm={6}>
+              <StatsCard
+                bigIcon={<i className="pe-7s-server text-warning" />}
+                statsText="Tamanho"
+                statsValue="2 MB"
+                
+                
+              />
+            </Col>
+
+            
+            <Col lg={6} sm={6}>
+              <StatsCard
+                bigIcon={<i className="pe-7s-graph1 text-danger" />}
+                statsText="Pessoas Encontradas"
+                statsValue="2"
+                
+              />
+            </Col>
+            
+      
+          </Row>
             
             <Row>
               <Col md={10}>              
@@ -199,8 +256,6 @@ class Dashboard extends Component {
                   }}
                   src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
                 />
-
-                {listAnnotations}
                          
               </Col>
   
@@ -230,6 +285,14 @@ class Dashboard extends Component {
                   <Button bsStyle="primary" onClick={this.changePlaybackRateRate(0.7)} fill block>Rápido</Button>
                 </Row>
               </Col> 
+            </Row>
+
+            <Row>
+                <Col md={12}>
+                  <ul>
+                    {listAnnotations}
+                  </ul>
+                </Col>
             </Row>
   
           </Grid>
