@@ -29,7 +29,22 @@ class NewPeople extends Component {
       this.handleSubmit = this.handleSubmit.bind(this);
       this.handleChangeName = this.handleChangeName.bind(this);
       this.handleChangeEmail = this.handleChangeEmail.bind(this);
+      this.signUp = this.signUp.bind(this);
  
+  }
+
+  signUp() {
+    const {name, email} = this.state;
+
+    const formData  = new FormData();
+
+    formData.append('name', name);
+    formData.append('email', email);
+
+    fetch('http://34.70.159.150/actors', {
+      method: 'POST',
+      body: formData
+     })
   }
 
   handleChangeName(event) {
@@ -43,7 +58,7 @@ class NewPeople extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    
+    this.signUp();
   }
 
   render() {

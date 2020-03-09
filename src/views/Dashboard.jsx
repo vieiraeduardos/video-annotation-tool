@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { Grid, Row, Col, form, FormGroup, ControlLabel, HelpBlock, FormControl} from "react-bootstrap";
 
+import  {Form} from 'react-bootstrap';
 
 import { Player } from 'video-react';
 import "../../node_modules/video-react/dist/video-react.css";
 import Button from 'components/CustomButton/CustomButton.jsx';
 
+import { FormInputs } from "components/FormInputs/FormInputs.jsx";
 
 function FieldGroup({ id, label, help, ...props }) {
   return (
@@ -21,7 +23,15 @@ class Dashboard extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {isLoading: false};
+    this.state = {
+      isLoading: false,
+      file: ""
+    }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChangeFile = this.handleChangeFile.bind(this);
+    this.fileInput = React.createRef();
+
   }
 
   play = () => {
@@ -51,6 +61,20 @@ class Dashboard extends Component {
     };
   }
 
+  handleSubmit(event) {
+    event.preventDefault();
+
+    this.setState({file: this.fileInput.current.files[0]});
+    
+    console.log(this.fileInput.current.files[0])
+  }
+
+  handleChangeFile(event) {
+    this.setState({file: event.target.value});
+
+    console.log(this.state);
+  }
+
   render() {
     const isLoading = this.state.isLoading;
 
@@ -62,13 +86,14 @@ class Dashboard extends Component {
             <Row>
               <Col md={12}>
 
-              <form>
-                <FieldGroup
-                  id="formControlsFile"
-                  type="file"
-                  label="Carregar vídeo"
-                  help="Por favor, carregue um vídeo em formato MP4 para processamento."
-                />
+              <form onSubmit={this.handleSubmit}>
+                <input type="file" ref={this.fileInput} />
+
+                <Button bsStyle="info" pullRight fill type="submit">
+                  Enviar
+                </Button>
+                <div className="clearfix" />
+                
               </form>
                 
               </Col> 
@@ -83,7 +108,8 @@ class Dashboard extends Component {
           <Grid fluid>
             
             <Row>
-              <Col md={10}>
+              <Col md={10}>              
+              
                 <Player
                   ref={player => {
                     this.player = player;
