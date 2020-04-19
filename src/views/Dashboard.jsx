@@ -7,8 +7,6 @@ import { Player } from 'video-react';
 import "../../node_modules/video-react/dist/video-react.css";
 import Button from 'components/CustomButton/CustomButton.jsx';
 
-import { FormInputs } from "components/FormInputs/FormInputs.jsx";
-
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 
 import './Main.css';
@@ -24,7 +22,9 @@ class Dashboard extends Component {
       isLoading: false,
       file: "",
       annotations: [],
-      actors: []
+      actors: [],
+      data: []
+
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -34,18 +34,56 @@ class Dashboard extends Component {
   }
 
   componentDidMount() {
-    axios.get('http://34.70.159.150/actors')
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      })
-      .finally(function () {
-        // always executed
-      });
+    const instance = axios.create({
+      baseURL: 'http://127.0.0.1:5000'
+    });
+
+    const annotations = [
+      {
+        'code': 1,
+        'video_id': 1,
+        'time': 1,
+        'person_id': 1,
+        'actor_id': null
+      },
+    
+      {
+        'code': 2,
+        'video_id': 1,
+        'time': 2,
+        'person_id': 1,
+        'actor_id': null
+      },
+    
+      {
+        'code': 3,
+        'video_id': 1,
+        'time': 3,
+        'person_id': 1,
+        'actor_id': null
+      },
+    
+      {
+        'code': 4,
+        'video_id': 1,
+        'time': 4,
+        'person_id': 2,
+        'actor_id': null
+      },
+
+      {
+        'code': 5,
+        'video_id': 1,
+        'time': 4,
+        'person_id': 3,
+        'actor_id': null
+      },
+    ];
+
+    this.setState({annotations: annotations});
+
+    this.processing(annotations);
+
   }
 
   play = () => {
@@ -111,59 +149,29 @@ class Dashboard extends Component {
     this.setState({'annotations': processedAnnotations})
   }
 
-  handleSubmit(event) {
+  async handleSubmit(event) {
     event.preventDefault();
 
     const uploaded_video = this.fileInput.current.files[0];
 
-    const annotations = [
-      {
-        'code': 1,
-        'video_id': 1,
-        'time': 1,
-        'person_id': 1,
-        'actor_id': null
-      },
-    
-      {
-        'code': 2,
-        'video_id': 1,
-        'time': 2,
-        'person_id': 1,
-        'actor_id': null
-      },
-    
-      {
-        'code': 3,
-        'video_id': 1,
-        'time': 3,
-        'person_id': 1,
-        'actor_id': null
-      },
-    
-      {
-        'code': 4,
-        'video_id': 1,
-        'time': 4,
-        'person_id': 2,
-        'actor_id': null
-      },
+    const formData = new FormData()
 
-      {
-        'code': 5,
-        'video_id': 1,
-        'time': 4,
-        'person_id': 3,
-        'actor_id': null
-      },
-    ];
+    formData.append('file', uploaded_video)
 
-    this.setState({annotations: annotations});
+    const result = await axios({
+      method: 'GET',
+      url: "/api/videos",
+      //data: formData
+    })
+    .then((response) => {
+      this.setState({data: response.data});
+    });
 
-    this.processing(annotations);
+    const data = this.state.data;
+
+    console.log(data[0]);  
 
     this.setState({isLoading: true})
-
 
   }
 
@@ -201,7 +209,7 @@ class Dashboard extends Component {
             <Row>
               <Col md={12}>
 
-              <form onSubmit={this.handleSubmit}>
+              <form onSubmit={this.handleSubmit} enctype="multipart/form-data">
                 <label>Por favor, carregar vídeo para anotação.</label>
                 <input type="file" ref={this.fileInput} />
 
