@@ -9,9 +9,6 @@ import Button from 'components/CustomButton/CustomButton.jsx';
 
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 
-import './Main.css';
-import './styles.css';
-
 import axios from 'axios';
 
 class Dashboard extends Component {

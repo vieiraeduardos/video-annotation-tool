@@ -6,7 +6,9 @@ import {
   Col,
   Image,
   Modal,
-  Button
+  Button,
+  ListGroup
+
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
@@ -14,21 +16,21 @@ import { Card } from "components/Card/Card.jsx";
 import avatar from "assets/img/faces/face-3.jpg";
 
 import axios from 'axios';
-import { useEffect } from "react";
-import { useState } from "react";
 
-
+import './styles.css';
 
 class PreAnnotation extends Component {
   constructor(props) {
     super(props);
-
+ 
     this.state = {
         'persons': [],
-        'modalShow': false
+        'modalShow': false,
+        'code': null
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
+    this.callModal = this.callModal.bind(this);
  
   }
 
@@ -55,6 +57,8 @@ class PreAnnotation extends Component {
 
     var lista = document.getElementById("lista");
 
+    console.log(this.state)
+
     if(this.state.persons.length > 0) {
       lista.innerHTML = "";
 
@@ -70,6 +74,12 @@ class PreAnnotation extends Component {
       lista.innerHTML = "";
       lista.appendChild(document.createTextNode("Nenhum resultado encontrado!"))
     }
+
+  }
+
+  callModal = () => {
+    this.setState({'modalShow': true});
+    this.setState({'code': 2});
 
   }
 
@@ -105,19 +115,19 @@ class PreAnnotation extends Component {
 
                     <Row>
                       <Col xs={6} md={4}>
-                        <Button variant="primary" onClick={() => this.setState({'modalShow': true})}>
+                        <Button variant="primary" onClick={this.callModal}>
                           Editar
                         </Button>
                       </Col>
 
                       <Col xs={6} md={4}>
-                        <Button variant="primary" onClick={() => this.setState({'modalShow': true})}>
+                        <Button variant="primary" onClick={this.callModal}>
                           Editar
                         </Button>
                       </Col>
 
                       <Col xs={6} md={4}>
-                        <Button variant="primary" onClick={() => this.setState({'modalShow': true})}>
+                        <Button variant="primary" onClick={this.callModal}>
                           Editar
                         </Button>
                       </Col>
@@ -155,6 +165,7 @@ class PreAnnotation extends Component {
             <ul id="lista"></ul>
           </Modal.Body>
           <Modal.Footer>
+            <Button onClick={() => this.setState({'modalShow': false})}>Confirmar</Button>
             <Button onClick={() => this.setState({'modalShow': false})}>Cancelar</Button>
           </Modal.Footer>
         </Modal>
