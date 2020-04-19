@@ -33,7 +33,7 @@ class NewPeople extends Component {
  
   }
 
-  signUp() {
+  async signUp() {
     const {name, email} = this.state;
 
     const formData  = new FormData();
@@ -41,10 +41,13 @@ class NewPeople extends Component {
     formData.append('name', name);
     formData.append('email', email);
 
-    fetch('http://34.70.159.150/actors', {
-      method: 'POST',
-      body: formData
-     })
+    const result = await fetch('http://127.0.0.1:5000/api/persons/', {
+        method: 'POST',
+        body: formData,
+    }).then((data) => {
+      return data;
+    });
+ 
   }
 
   handleChangeName(event) {
