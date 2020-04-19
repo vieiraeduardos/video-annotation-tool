@@ -4,24 +4,28 @@ import {
   Grid,
   Row,
   Col,
-  Image
+  Image,
+  Modal,
+  Button
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
 
 import avatar from "assets/img/faces/face-3.jpg";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck} from '@fortawesome/free-solid-svg-icons'
-
 import axios from 'axios';
+import { useEffect } from "react";
+import { useState } from "react";
+
+
 
 class PreAnnotation extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-        'persons': []
+        'persons': [],
+        'modalShow': false
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -48,6 +52,24 @@ class PreAnnotation extends Component {
     .then((response) => {
       this.setState({persons: response.data});
     });
+
+    var lista = document.getElementById("lista");
+
+    if(this.state.persons.length > 0) {
+      lista.innerHTML = "";
+
+      for(var index in this.state.persons) {
+        var li = document.createElement('li');
+        var text = document.createTextNode(this.state.persons[index][1]);
+
+        li.appendChild(text);
+
+        lista.appendChild(li);
+      }
+    } else {
+      lista.innerHTML = "";
+      lista.appendChild(document.createTextNode("Nenhum resultado encontrado!"))
+    }
 
   }
 
@@ -83,30 +105,21 @@ class PreAnnotation extends Component {
 
                     <Row>
                       <Col xs={6} md={4}>
-                        <input type='text' style={{width: "90%"}}/>
-
-                        <button>
-                            <FontAwesomeIcon icon={faCheck} />
-                        </button>
+                        <Button variant="primary" onClick={() => this.setState({'modalShow': true})}>
+                          Editar
+                        </Button>
                       </Col>
 
                       <Col xs={6} md={4}>
-                        <input type='text' style={{width: "90%"}}/>
-
-                        <button>
-                            <FontAwesomeIcon icon={faCheck} />
-                        </button>
+                        <Button variant="primary" onClick={() => this.setState({'modalShow': true})}>
+                          Editar
+                        </Button>
                       </Col>
 
                       <Col xs={6} md={4}>
-                        <input type='text' style={{width: "90%"}} onChange={this.handleChangeInput}/>
-
-                        <button>
-                            <FontAwesomeIcon icon={faCheck} />
-                        </button>
-
-                        <p id="option"></p>
-
+                        <Button variant="primary" onClick={() => this.setState({'modalShow': true})}>
+                          Editar
+                        </Button>
                       </Col>
                     </Row>
 
@@ -119,6 +132,32 @@ class PreAnnotation extends Component {
             
           </Row>
         </Grid>
+
+        <Modal
+          show={this.state.modalShow}
+          onHide={() => this.setState({'modalShow': false})}
+          size="lg"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Quem está nas fotos?
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              Escolha uma pessoa na lista abaixo que está representado nas fotos.
+            </p>
+
+            <input type='text' style={{width: "100%"}} onChange={this.handleChangeInput}/>
+
+            <ul id="lista"></ul>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => this.setState({'modalShow': false})}>Cancelar</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
