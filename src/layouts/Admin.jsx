@@ -46,7 +46,7 @@ class Admin extends Component {
       title: <span data-notify="icon" className="pe-7s-gift" />,
       message: (
         <div>
-          Bem-vindo ao <b>Projeto VHS</b> - uma linda ferramenta de anotação de vídeo.
+          Bem-vindo ao <b>Projeto VAT</b> - uma linda ferramenta de anotação de vídeo.
         </div>
       ),
       level: level,
@@ -127,7 +127,7 @@ class Admin extends Component {
       title: <span data-notify="icon" className="pe-7s-gift" />,
       message: (
         <div>
-          Bem-vindo ao <b>Projeto VHS</b> - uma linda ferramenta de anotação de vídeo.
+          Bem-vindo ao <b>Projeto VAT</b> - uma linda ferramenta de anotação de vídeo.
         </div>
       ),
       level: level,
