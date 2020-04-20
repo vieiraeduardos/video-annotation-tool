@@ -2,6 +2,7 @@ import Dashboard from "views/Dashboard.jsx";
 import NewPeople from "views/NewPeople.jsx";
 import Verification from "views/Verification.jsx";
 import PreAnnotation from "views/PreAnnotation.jsx";
+import Status from "views/Status.jsx";
 
 const dashboardRoutes = [
   {
@@ -15,7 +16,7 @@ const dashboardRoutes = [
   {
     path: "/newpeople",
     name: "Novo Ator",
-    icon: "pe-7s-graph",
+    icon: "pe-7s-add-user",
     component: NewPeople,
     layout: "/admin"
   },
@@ -23,7 +24,7 @@ const dashboardRoutes = [
   {
     path: "/verification",
     name: "Verificação",
-    icon: "pe-7s-graph",
+    icon: "pe-7s-check",
     component: Verification,
     layout: "/admin"
   },
@@ -31,8 +32,16 @@ const dashboardRoutes = [
   {
     path: "/preannotation",
     name: "Pré-anotação",
-    icon: "pe-7s-graph",
+    icon: "pe-7s-link",
     component: PreAnnotation,
+    layout: "/admin"
+  },
+
+  {
+    path: "/status",
+    name: "Estatísticas",
+    icon: "pe-7s-graph1",
+    component: Status,
     layout: "/admin"
   },
 ];
