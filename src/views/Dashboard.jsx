@@ -1,7 +1,5 @@
 import React, { Component } from "react";
-import { Grid, Row, Col, form, FormGroup, ControlLabel, HelpBlock, FormControl} from "react-bootstrap";
-
-import  {Form} from 'react-bootstrap';
+import { Grid, Row, Col } from "react-bootstrap";
 
 import { Player } from 'video-react';
 import "../../node_modules/video-react/dist/video-react.css";
