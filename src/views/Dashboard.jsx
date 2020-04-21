@@ -6,8 +6,16 @@ import "../../node_modules/video-react/dist/video-react.css";
 import Button from 'components/CustomButton/CustomButton.jsx';
 
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
-
+import { UserCard } from "components/UserCard/UserCard.jsx";
 import axios from 'axios';
+
+import "./Main.css";
+
+import avatar from 'assets/img/faces/eduardo.jpg';
+
+import { Dots } from 'react-activity';
+import 'react-activity/dist/react-activity.css';
+import fs from 'fs';
 
 class Dashboard extends Component {
 
@@ -18,7 +26,9 @@ class Dashboard extends Component {
       file: "",
       annotations: [],
       actors: [],
-      data: []
+      data: [],
+      isProcessing: false,
+      href: null
 
     }
 
@@ -32,81 +42,8 @@ class Dashboard extends Component {
     const instance = axios.create({
       baseURL: 'http://127.0.0.1:5000'
     });
-
-    const annotations = [
-      {
-        'code': 1,
-        'video_id': 1,
-        'time': 1,
-        'person_id': 1,
-        'actor_id': null
-      },
-    
-      {
-        'code': 2,
-        'video_id': 1,
-        'time': 2,
-        'person_id': 1,
-        'actor_id': null
-      },
-    
-      {
-        'code': 3,
-        'video_id': 1,
-        'time': 3,
-        'person_id': 1,
-        'actor_id': null
-      },
-    
-      {
-        'code': 4,
-        'video_id': 1,
-        'time': 4,
-        'person_id': 2,
-        'actor_id': null
-      },
-
-      {
-        'code': 5,
-        'video_id': 1,
-        'time': 4,
-        'person_id': 3,
-        'actor_id': null
-      },
-    ];
-
-    this.setState({annotations: annotations});
-
-    this.processing(annotations);
-
   }
 
-  play = () => {
-    this.player.play();
-  }
-
-  pause = () => {
-    this.player.pause();
-  }
-
-  changeCurrentTime = (seconds) =>{
-    return () => {
-      const { player } = this.player.getState();
-      this.player.seek(player.currentTime + seconds);
-    };
-  }
-
-  changePlaybackRateRate(steps) {
-    return () => {
-      const { player } = this.player.getState();
-
-      if(steps == 0) {
-        this.player.playbackRate = 1;
-      } else {
-        this.player.playbackRate = 1 + steps;
-      }
-    };
-  }
 
   handleSubmit(event) {
     event.preventDefault();
@@ -121,30 +58,10 @@ class Dashboard extends Component {
 
     console.log(this.state);
   }
-  
-  processing(annotations) {
-    var processedAnnotations = [];
-
-    for(var i = 0; i < annotations.length; i++) {
-      var isFound = false;
-
-      for(var j = 0; j < processedAnnotations.length; j++) {
-        if(annotations[i].person_id == processedAnnotations[j].person_id) {
-          isFound = true;
-          processedAnnotations[j].end_time = annotations[i].time;
-          break;          
-        }
-      }
-
-      if(!isFound) {
-        processedAnnotations.push({'code': annotations[i].code, 'person_id': annotations[i].person_id, 'start_time': annotations[i].time, 'end_time': annotations[i].time})
-      } 
-    }
-
-    this.setState({'annotations': processedAnnotations})
-  }
 
   async handleSubmit(event) {
+    var FileDownload = require('js-file-download');
+
     event.preventDefault();
 
     const uploaded_video = this.fileInput.current.files[0];
@@ -153,13 +70,26 @@ class Dashboard extends Component {
 
     formData.append('file', uploaded_video)
 
+    this.setState({isProcessing: true});
+
     const result = await axios({
-      method: 'GET',
+      method: 'POST',
       url: "/api/videos",
-      //data: formData
+      data: formData,
+      responseType: 'arraybuffer',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
     })
-    .then((response) => {
-      this.setState({data: response.data});
+    .then(({ data }) => {
+      const downloadUrl = window.URL.createObjectURL(new Blob([data]));
+      console.log(data);
+
+      this.setState({"href": downloadUrl});
+
+      this.setState({data: data});
+
+      this.setState({isProcessing: false});
     });
 
     const data = this.state.data;
@@ -171,139 +101,127 @@ class Dashboard extends Component {
   }
 
   render() {
-    const isLoading = this.state.isLoading;
+    const {isLoading, isProcessing} = this.state;
 
-    const listAnnotations = this.state.annotations.map((annotation) =>
-
-    <li className="dev-item">
-        <header>
-            <div className="user-info">
-                <strong>ID : {annotation.person_id}</strong>
-                <span>Começo: {annotation.start_time} Término: {annotation.end_time}</span>
-            </div>
-        </header>
-        <p>
-          <label>
-            Escolha o ator: 
-            </label> 
-            <select value={this.state.value} onChange={this.handleChange}>
-              <option value="eduardo">Eduardo</option>
-              <option value="arthur">Arthur</option>
-              
-            </select>
-         
-        </p>
-    </li>
-    );
-
-    if(!isLoading) {
+    if(isProcessing) {
       return (
-        <div className="content">
-          <Grid fluid>
-            
-            <Row>
-              <Col md={12}>
-
-              <form onSubmit={this.handleSubmit} enctype="multipart/form-data">
-                <label>Por favor, carregar vídeo para anotação.</label>
-                <input type="file" ref={this.fileInput} />
-
-                <Button bsStyle="info" pullRight fill type="submit">
-                  Enviar
-                </Button>
-                <div className="clearfix" />
-                
-                
-              </form>
-                
-              </Col> 
-            </Row>
-  
-          </Grid>
-        </div>
-      )
-    } else {
-      return (
-        <div className="content">
-          <Grid fluid>
-
+        <Grid fluid>
           <Row>
-            <Col lg={6} sm={6}>
-              <StatsCard
-                bigIcon={<i className="pe-7s-server text-warning" />}
-                statsText="Tamanho"
-                statsValue="2 MB"
-                
-                
-              />
+            <Col lg={7} sm={7}>
             </Col>
-
-            
-            <Col lg={6} sm={6}>
-              <StatsCard
-                bigIcon={<i className="pe-7s-graph1 text-danger" />}
-                statsText="Pessoas Encontradas"
-                statsValue="2"
-                
-              />
+            <Col lg={5} sm={5}>
+              <Dots size={30} />
             </Col>
-            
-      
           </Row>
-            
-            <Row>
-              <Col md={10}>              
-              
-                <Player
-                  ref={player => {
-                    this.player = player;
-                  }}
-                  src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
-                />
-                         
-              </Col>
-  
-              <Col md={2}>
-                <Row>
-                  <Button bsStyle="primary" onClick={this.play} fill block>Tocar</Button>
-                </Row>
-                <Row>
-                  <Button bsStyle="primary" onClick={this.pause} fill block>Pausar</Button>
-                </Row>
-                <Row>
-                  <Button bsStyle="primary" onClick={this.changeCurrentTime(10)} fill block>Avançar</Button>
-                </Row>
-                <Row>
-                  <Button bsStyle="primary" onClick={this.changeCurrentTime(-10)} fill block>Retroceder</Button>
-                </Row>
-  
-                <Row>
-                  <Button bsStyle="primary" onClick={this.changePlaybackRateRate(-0.7)} fill block>Lento</Button>
-                </Row>
-  
-                <Row>
-                  <Button bsStyle="primary" onClick={this.changePlaybackRateRate(0)} fill block>Normal</Button>
-                </Row>
-  
-                <Row>
-                  <Button bsStyle="primary" onClick={this.changePlaybackRateRate(0.7)} fill block>Rápido</Button>
-                </Row>
-              </Col> 
-            </Row>
+        </Grid>
+      )
 
-            <Row>
+    } else {
+      if(!isLoading) {
+        return (
+          <div className="content">
+            <Grid fluid>
+              
+              <Row>
                 <Col md={12}>
-                  <ul>
-                    {listAnnotations}
-                  </ul>
-                </Col>
-            </Row>
   
-          </Grid>
-        </div>
-      );
+                <form onSubmit={this.handleSubmit} enctype="multipart/form-data">
+                  <label>Por favor, carregar vídeo para anotação.</label>
+                  <input type="file" ref={this.fileInput} />
+  
+                  <Button bsStyle="info" pullRight fill type="submit">
+                    Enviar
+                  </Button>
+                  <div className="clearfix" />
+                  
+                  
+                </form>
+                  
+                </Col> 
+              </Row>
+    
+            </Grid>
+          </div>
+        )
+      } else {
+        return (
+          <div className="content">
+            <Grid fluid>
+  
+              <Row>
+              <Col lg={4} sm={4}>
+                  <StatsCard
+                    bigIcon={<i className="pe-7s-note2 text-success" />}
+                    statsText="Anotações"
+                    statsValue="200"
+                    statsIcon={<i className="fa fa-refresh" />}
+                    statsIconText="Atualizar"
+                  />
+                </Col>
+  
+                <Col lg={8} sm={8}>
+                  <StatsCard
+                    bigIcon={<i className="pe-7s-user text-success" />}
+                    statsText="Rostos Encontrados"
+                    statsValue="20"
+                    statsIcon={<i className="fa fa-refresh" />}
+                    statsIconText="Atualizar"
+                  />
+                </Col>
+      
+              </Row>
+  
+              <Row>
+                <Col lg={12} sm={12}>
+                <UserCard
+                    bgImage="https://ununsplash.imgix.net/photo-1431578500526-4d9613015464?fit=crop&fm=jpg&h=300&q=75&w=400"
+                    avatar={avatar}
+                    name="Eduardo Vieira"
+                    userName="vieiraeduardos"
+                    description={
+                      <div>
+                        <Row>
+                          <Col lg={12} sm={12}>
+                              <span>
+                                O vídeo foi processado com sucessso!
+                              </span>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg={12} sm={12}>
+                              <span>
+                                Opções
+                              </span>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg={3} sm={3}></Col>
+                          <Col lg={6} sm={6}>
+                              <Button bsStyle="info" round block fill type="submit">
+                                <a download="annotations.zip" href={this.state.href} style={{ 'color': "white" }}>Baixar</a>
+                              </Button>
+                            </Col>
+                        </Row>
+                      </div>
+                    }
+                    socials={
+                        <div>
+                            
+                        </div>
+                    }
+                />
+  
+                </Col>
+              </Row>
+              
+            </Grid>
+          </div>
+        );
+  
+      }  
 
     }
+
   }
 }
 
