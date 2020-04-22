@@ -3,6 +3,7 @@ import NewPeople from "views/NewPeople.jsx";
 import Verification from "views/Verification.jsx";
 import PreAnnotation from "views/PreAnnotation.jsx";
 import Status from "views/Status.jsx";
+import Videos from "views/Videos.jsx";
 
 const dashboardRoutes = [
   {
@@ -42,6 +43,14 @@ const dashboardRoutes = [
     name: "Estatísticas",
     icon: "pe-7s-graph1",
     component: Status,
+    layout: "/admin"
+  },
+
+  {
+    path: "/videos",
+    name: "Videos",
+    icon: "pe-7s-graph1",
+    component: Videos,
     layout: "/admin"
   },
 ];

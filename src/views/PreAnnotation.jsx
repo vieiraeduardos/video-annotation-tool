@@ -26,7 +26,9 @@ class PreAnnotation extends Component {
     this.state = {
         'persons': [],
         'modalShow': false,
-        'code': null
+        'code': null,
+        'video_code': 11,
+        'annotations': []
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -37,6 +39,15 @@ class PreAnnotation extends Component {
   componentDidMount() {
     const instance = axios.create({
       baseURL: 'http://127.0.0.1:5000'
+    });
+
+
+    await axios({
+      method: 'GET',
+      url: "/api/annotations/"  
+    })
+    .then((response) => {
+      this.setState({'annotations': response.data});
     });
     
   }
