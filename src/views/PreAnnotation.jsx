@@ -11,9 +11,9 @@ import {
 
 } from "react-bootstrap";
 
-import { Card } from "components/Card/Card.jsx";
+import { Table } from "react-bootstrap";
 
-import avatar from "assets/img/faces/face-3.jpg";
+import Card from "components/Card/Card.jsx";
 
 import axios from 'axios';
 
@@ -28,7 +28,9 @@ class PreAnnotation extends Component {
         'modalShow': false,
         'code': null,
         'video_code': 11,
-        'annotations': []
+        'annotations': [],
+        'avatar': null,
+        'photos': []
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -36,11 +38,21 @@ class PreAnnotation extends Component {
  
   }
 
-  componentDidMount() {
+  isInside(photos, code) {
+    for(var i in photos) {
+      console.log("CODE " + photos[i]["actor"])
+      if(photos[i]["actor"] == code) {
+        return i
+      }
+    }
+
+    return 999
+  }
+
+  async componentDidMount() {
     const instance = axios.create({
       baseURL: 'http://127.0.0.1:5000'
     });
-
 
     await axios({
       method: 'GET',
@@ -49,6 +61,61 @@ class PreAnnotation extends Component {
     .then((response) => {
       this.setState({'annotations': response.data});
     });
+
+    await axios({
+      method: 'GET',
+      url: "/api/image/",
+      responseType: 'arraybuffer',
+    })
+    .then((response) => {
+      const base64 = btoa(
+        new Uint8Array(response.data).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          '',
+        ),
+      );
+      this.setState({ 'avatar': "data:;base64," + base64 });
+    });
+
+    /** Pegando lista de fotos segundo as anotações */
+    const annotations = this.state.annotations;
+
+    for (var i in annotations) {
+      const formData = new FormData()
+
+      formData.append('path', annotations[i][8])
+
+      await axios({
+        method: 'POST',
+        url: "/api/image/",
+        data: formData,
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        const base64 = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            '',
+          ),
+        );
+
+        var photos = this.state.photos;
+        var actor = annotations[i][2];
+
+        var result = this.isInside(photos, actor);
+
+        if(result == 999) {
+          photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}]})
+
+          this.setState({photos: photos}) 
+        } else {
+          photos[result]['photos'].push({'source': "data:;base64," + base64});
+
+          this.setState({photos: photos});
+        }
+        
+      });
+    }
     
   }
 
@@ -67,8 +134,6 @@ class PreAnnotation extends Component {
     });
 
     var lista = document.getElementById("lista");
-
-    console.log(this.state)
 
     if(this.state.persons.length > 0) {
       lista.innerHTML = "";
@@ -94,59 +159,94 @@ class PreAnnotation extends Component {
 
   }
 
+  getPhotos() {
+    var photos = this.state.photos;
+    var count = [];
+
+    for(var i in photos) {
+      count.push(i);
+    }
+
+    console.log("GET PHOTOS");
+    console.log(photos[0]);
+
+    const listaDeImagens = count.map((index) =>
+
+    <Col md={12}>
+      <Card
+        title=""
+        content={
+          <form onSubmit={this.handleSubmit}>
+
+            <Row>
+              <Col xs={12} md={12}>
+                {photos[index].photos.map((source) => 
+                  <Image src={source.source} rounded width={60} height={60}/>
+                )}        
+              </Col>
+            </Row>
+            
+            <Row>
+              <Col xs={6} md={4}>
+                <Button variant="primary" onClick={this.callModal}>
+                  Editar
+                </Button>
+              </Col>
+            </Row>
+            
+            <div className="clearfix" />
+          </form>
+        }
+      />
+    </Col>
+    )
+
+    return listaDeImagens;
+  }
+
   render() {
 
-    const list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((response) => 
-      <Image src={avatar} rounded width={60} height={60}/>
-    )
+    const thArray = ["ID", "Video", "Ator", "X", "Y", "W", "H", "Tempo", "Caminho"];
+    
+    const tdArray = this.state.annotations;
+
+    const list1 = this.getPhotos();
 
     return (
       <div className="content">
         <Grid fluid>
           <Row>
+
+            {list1}
+            
+
             <Col md={12}>
               <Card
-                title="Pré anotação"
+                title="Lista de Anotações"
+                category="Lista denaotações do vídeo X"
+                ctTableFullWidth
+                ctTableResponsive
                 content={
-                  <form onSubmit={this.handleSubmit}>
-                    
-                    <Row>
-                      <Col xs={6} md={4}>
-                          {list1}
-                      </Col>
-
-                      <Col xs={6} md={4}>
-                          {list1}
-                      </Col>
-
-                      <Col xs={6} md={4}>
-                          {list1}
-                      </Col>
-                    </Row>
-
-                    <Row>
-                      <Col xs={6} md={4}>
-                        <Button variant="primary" onClick={this.callModal}>
-                          Editar
-                        </Button>
-                      </Col>
-
-                      <Col xs={6} md={4}>
-                        <Button variant="primary" onClick={this.callModal}>
-                          Editar
-                        </Button>
-                      </Col>
-
-                      <Col xs={6} md={4}>
-                        <Button variant="primary" onClick={this.callModal}>
-                          Editar
-                        </Button>
-                      </Col>
-                    </Row>
-
-                    
-                    <div className="clearfix" />
-                  </form>
+                  <Table striped hover>
+                    <thead>
+                      <tr>
+                        {thArray.map((prop, key) => {
+                          return <th key={key}>{prop}</th>;
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tdArray.map((prop, key) => {
+                        return (
+                          <tr key={key}>
+                            {prop.map((prop, key) => {
+                              return <td key={key}>{prop}</td>;
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </Table>
                 }
               />
             </Col>
