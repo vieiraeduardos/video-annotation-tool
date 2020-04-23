@@ -33,6 +33,7 @@ class PreAnnotation extends Component {
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
     this.loadModal = this.loadModal.bind(this);
+    this.confirm = this.confirm.bind(this);
  
   }
 
@@ -186,6 +187,29 @@ class PreAnnotation extends Component {
     return listaDeImagens;
   }
 
+  async confirm() {
+    const option = this.state.option;
+    const actor = this.state.code;
+
+    console.log("OPTION: " + option);
+    console.log("ACTOR: " + actor);
+
+    var formData = new FormData();
+
+    formData.append("option", option);
+    formData.append("actor", actor);
+
+    /** Atualiza pessoa no conjunto de imagens */
+    await axios({
+      method: 'PUT',
+      url: "/api/actors/",
+      data: formData
+    })
+    .then((response) => {
+      this.setState({'modalShow': false})
+    })
+  }
+
   render() {
 
     const thArray = ["ID", "Video", "Ator", "X", "Y", "W", "H", "Tempo", "Caminho"];
@@ -260,7 +284,7 @@ class PreAnnotation extends Component {
             </ul>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={() => this.setState({'modalShow': false})}>Confirmar</Button>
+            <Button onClick={this.confirm}>Confirmar</Button>
             <Button onClick={() => this.setState({'modalShow': false})}>Cancelar</Button>
           </Modal.Footer>
         </Modal>
