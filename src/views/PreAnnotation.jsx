@@ -31,7 +31,8 @@ class PreAnnotation extends Component {
         'annotations': [],
         'avatar': null,
         'photos': [],
-        'options': null
+        'options': null,
+        'option': null
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -119,7 +120,11 @@ class PreAnnotation extends Component {
     
   }
 
-  
+  /** Escolhe uma opção na lista */
+  chooseOption(code) {
+    this.setState({"option": code});
+    
+  }
 
   /** Pesquisa no DB nomes de pessoas */
   handleChangeInput = async (event) => {
