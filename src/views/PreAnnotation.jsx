@@ -7,11 +7,8 @@ import {
   Image,
   Modal,
   Button,
-  ListGroup
-
+  Table
 } from "react-bootstrap";
-
-import { Table } from "react-bootstrap";
 
 import Card from "components/Card/Card.jsx";
 
@@ -29,7 +26,6 @@ class PreAnnotation extends Component {
         'code': null,
         'video_code': 11,
         'annotations': [],
-        'avatar': null,
         'photos': [],
         'options': null,
         'option': null
@@ -51,7 +47,8 @@ class PreAnnotation extends Component {
   }
 
   async componentDidMount() {
-    const instance = axios.create({
+    /** Definindo URL da API */
+    axios.create({
       baseURL: 'http://127.0.0.1:5000'
     });
 
@@ -61,21 +58,6 @@ class PreAnnotation extends Component {
     })
     .then((response) => {
       this.setState({'annotations': response.data});
-    });
-
-    await axios({
-      method: 'GET',
-      url: "/api/image/",
-      responseType: 'arraybuffer',
-    })
-    .then((response) => {
-      const base64 = btoa(
-        new Uint8Array(response.data).reduce(
-          (data, byte) => data + String.fromCharCode(byte),
-          '',
-        ),
-      );
-      this.setState({ 'avatar': "data:;base64," + base64 });
     });
 
     /** Pegando lista de fotos segundo as anotações */
