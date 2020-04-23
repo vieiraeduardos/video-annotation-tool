@@ -30,17 +30,17 @@ class PreAnnotation extends Component {
         'video_code': 11,
         'annotations': [],
         'avatar': null,
-        'photos': []
+        'photos': [],
+        'options': null
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
-    this.callModal = this.callModal.bind(this);
+    this.loadModal = this.loadModal.bind(this);
  
   }
 
   isInside(photos, code) {
     for(var i in photos) {
-      console.log("CODE " + photos[i]["actor"])
       if(photos[i]["actor"] == code) {
         return i
       }
@@ -119,43 +119,41 @@ class PreAnnotation extends Component {
     
   }
 
+  
+
+  /** Pesquisa no DB nomes de pessoas */
   handleChangeInput = async (event) => {
     event.preventDefault();
-    
-    const name = event.target.value;
+    /** q guarda o nome da pessoa pesquisada no DB */
+    const q = event.target.value;
 
-    const result = await axios({
+    await axios({
       method: 'GET',
-      url: "/api/persons/" + name,
-      
+      url: "/api/persons/" + q
     })
     .then((response) => {
       this.setState({persons: response.data});
     });
 
-    var lista = document.getElementById("lista");
+    /** Listando opções de pessoas na pesquisa */
+    const persons = this.state.persons;
 
-    if(this.state.persons.length > 0) {
-      lista.innerHTML = "";
+    var options = <p>Nenhum resultado encontrado!</p>
 
-      for(var index in this.state.persons) {
-        var li = document.createElement('li');
-        var text = document.createTextNode(this.state.persons[index][1]);
-
-        li.appendChild(text);
-
-        lista.appendChild(li);
-      }
-    } else {
-      lista.innerHTML = "";
-      lista.appendChild(document.createTextNode("Nenhum resultado encontrado!"))
+    /** Se existir correspondência na pesquisa, mostra as opções */
+    if(persons.length > 0) {
+      
+      options = persons.map((person) => 
+        <li onClick={() => this.chooseOption(person[0])}>{person[1]}</li>
+      )
     }
 
+    this.setState({'options': options})
   }
 
-  callModal = () => {
+  loadModal = (actor) => {
     this.setState({'modalShow': true});
-    this.setState({'code': 2});
+    this.setState({'code': actor});
 
   }
 
@@ -166,9 +164,6 @@ class PreAnnotation extends Component {
     for(var i in photos) {
       count.push(i);
     }
-
-    console.log("GET PHOTOS");
-    console.log(photos[0]);
 
     const listaDeImagens = count.map((index) =>
 
@@ -188,7 +183,7 @@ class PreAnnotation extends Component {
             
             <Row>
               <Col xs={6} md={4}>
-                <Button variant="primary" onClick={this.callModal}>
+                <Button variant="primary" onClick={() => this.loadModal(photos[index].actor)}>
                   Editar
                 </Button>
               </Col>
@@ -210,20 +205,20 @@ class PreAnnotation extends Component {
     
     const tdArray = this.state.annotations;
 
-    const list1 = this.getPhotos();
+    const listaDeFaces = this.getPhotos();
+    const listaDeOpcoes = this.state.options;
 
     return (
       <div className="content">
         <Grid fluid>
           <Row>
 
-            {list1}
-            
+            {listaDeFaces}
 
             <Col md={12}>
               <Card
                 title="Lista de Anotações"
-                category="Lista denaotações do vídeo X"
+                category="Lista de anotações do vídeo X"
                 ctTableFullWidth
                 ctTableResponsive
                 content={
@@ -273,7 +268,9 @@ class PreAnnotation extends Component {
 
             <input type='text' style={{width: "100%"}} onChange={this.handleChangeInput}/>
 
-            <ul id="lista"></ul>
+            <ul id="lista">
+              { listaDeOpcoes }
+            </ul>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={() => this.setState({'modalShow': false})}>Confirmar</Button>
