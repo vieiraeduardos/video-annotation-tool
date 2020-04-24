@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Grid, Row, Col } from "react-bootstrap";
 
-import { Player } from 'video-react';
 import "../../node_modules/video-react/dist/video-react.css";
 import Button from 'components/CustomButton/CustomButton.jsx';
 
@@ -13,9 +12,10 @@ import "./Main.css";
 
 import avatar from 'assets/img/faces/eduardo.jpg';
 
-import { Dots } from 'react-activity';
 import 'react-activity/dist/react-activity.css';
-import fs from 'fs';
+
+import Lottie from 'react-lottie';
+import animation from './animation.gif';
 
 class Dashboard extends Component {
 
@@ -28,7 +28,9 @@ class Dashboard extends Component {
       actors: [],
       data: [],
       isProcessing: false,
-      href: null
+      href: null,
+      isStopped: false, 
+      isPaused: false
 
     }
 
@@ -107,10 +109,8 @@ class Dashboard extends Component {
       return (
         <Grid fluid>
           <Row>
-            <Col lg={7} sm={7}>
-            </Col>
-            <Col lg={5} sm={5}>
-              <Dots size={30} />
+            <Col lg={12} sm={12}>
+              <img style={{width: "400px", heigh: "400px", display: "block", marginLeft: "auto", marginRight: "auto"}} src={animation} alt="loading..."/>
             </Col>
           </Row>
         </Grid>
