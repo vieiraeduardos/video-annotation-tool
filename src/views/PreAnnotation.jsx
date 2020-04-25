@@ -7,7 +7,9 @@ import {
   Image,
   Modal,
   Button,
-  Table
+  Table,
+  Alert
+
 } from "react-bootstrap";
 
 import Card from "components/Card/Card.jsx";
@@ -15,6 +17,8 @@ import Card from "components/Card/Card.jsx";
 import axios from 'axios';
 
 import './styles.css';
+
+import avatar from '../assets/img/faces/eduardo.jpg';
 
 class PreAnnotation extends Component {
   constructor(props) {
@@ -28,12 +32,15 @@ class PreAnnotation extends Component {
         'annotations': [],
         'photos': [],
         'options': null,
-        'option': null
+        'option': null,
+        'name': "",
+        'showMessage': false
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
     this.loadModal = this.loadModal.bind(this);
     this.confirm = this.confirm.bind(this);
+    this.getPhotos = this.getPhotos.bind(this);
  
   }
 
@@ -89,7 +96,7 @@ class PreAnnotation extends Component {
         var result = this.isInside(photos, actor);
 
         if(result == 999) {
-          photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}]})
+          photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}], name: annotations[i][10]})
 
           this.setState({photos: photos}) 
         } else {
@@ -104,8 +111,9 @@ class PreAnnotation extends Component {
   }
 
   /** Escolhe uma opção na lista */
-  chooseOption(code) {
-    this.setState({"option": code});
+  chooseOption(person) {
+    this.setState({"option": person[0]});
+    this.setState({"name": person[1]});
     
   }
 
@@ -132,7 +140,7 @@ class PreAnnotation extends Component {
     if(persons.length > 0) {
       
       options = persons.map((person) => 
-        <li onClick={() => this.chooseOption(person[0])}>{person[1]}</li>
+        <li onClick={() => this.chooseOption(person)}>{person[1]}</li>
       )
     }
 
@@ -170,11 +178,16 @@ class PreAnnotation extends Component {
             </Row>
             
             <Row>
-              <Col xs={6} md={4}>
+              <Col xs={12} md={12}>
                 <Button variant="primary" onClick={() => this.loadModal(photos[index].actor)}>
-                  Editar
+                  Anotar
                 </Button>
+
+                <img style={{width: "30px", heigh: "30px", borderRadius: "50%", marginLeft: "auto"}} src={avatar} alt="loading..."/>
+
+                <span>{photos[index].name}</span>
               </Col>
+
             </Row>
             
             <div className="clearfix" />
@@ -206,8 +219,27 @@ class PreAnnotation extends Component {
       data: formData
     })
     .then((response) => {
-      this.setState({'modalShow': false})
+      this.setState({'modalShow': false});
+
+      this.setState({'showMessage': true});
+
+
     })
+  }
+
+  showMessage() {
+    console.log(this.state.showMessage)
+    if(this.state.showMessage) {
+      return (
+        <Col lg={12} md={12}>
+          <Alert variant={"danger"}>
+            Anotação realizada com sucesso!
+          </Alert>
+        </Col>
+      );
+    } 
+
+    return (<div></div>)
   }
 
   render() {
@@ -218,11 +250,14 @@ class PreAnnotation extends Component {
 
     const listaDeFaces = this.getPhotos();
     const listaDeOpcoes = this.state.options;
+    const m = this.showMessage();
+    const name = this.state.name !== "" ? <Alert variant={"danger"}>{this.state.name}</Alert> : <p></p>;
 
     return (
       <div className="content">
         <Grid fluid>
           <Row>
+            {m}          
 
             {listaDeFaces}
 
@@ -277,7 +312,9 @@ class PreAnnotation extends Component {
               Escolha uma pessoa na lista abaixo que está representado nas fotos.
             </p>
 
-            <input type='text' style={{width: "100%"}} onChange={this.handleChangeInput}/>
+            <input type='text' style={{width: "100%", marginBottom: "5px"}} onChange={this.handleChangeInput}/>
+
+            {name}
 
             <ul id="lista">
               { listaDeOpcoes }

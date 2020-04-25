@@ -6,7 +6,8 @@ import {
   Col,
   FormGroup,
   ControlLabel,
-  FormControl
+  FormControl,
+  Alert
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
@@ -23,7 +24,8 @@ class NewPeople extends Component {
 
       this.state = {
           name: "",
-          email: ""
+          email: "",
+          'showMessage': false
       }
 
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -45,7 +47,7 @@ class NewPeople extends Component {
         method: 'POST',
         body: formData,
     }).then((data) => {
-      return data;
+      this.setState({"showMessage": true})
     });
  
   }
@@ -60,17 +62,35 @@ class NewPeople extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-
     this.signUp();
   }
 
+  showMessage() {
+    console.log(this.state.showMessage)
+    if(this.state.showMessage) {
+      return (
+        <Col lg={12} md={12}>
+          <Alert variant={"danger"}>
+            Ator criado com sucesso!
+          </Alert>
+        </Col>
+      );
+    } 
+
+    return (<div></div>)
+  }
+
   render() {
+
+    const m = this.showMessage();
 
     return (
       <div className="content">
         <Grid fluid>
           <Row>
+            {m}
             <Col md={12}>
+
               <Card
                 title="Cadastrar novo ator"
                 content={

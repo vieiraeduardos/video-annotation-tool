@@ -89,14 +89,7 @@ class Status extends Component {
                 statsIconText="Atualizar"
               />
             </Col>
-          </Row>
-
-          <Row>
-            <Col lg={12} sm={12}>
-              {listaDeVideos}
-            </Col>
-          </Row>
-          
+          </Row>         
           
         </Grid>
       </div>
