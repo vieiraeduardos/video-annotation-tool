@@ -29,19 +29,19 @@ class Dashboard extends Component {
       data: [],
       isProcessing: false,
       href: null,
-      isStopped: false, 
-      isPaused: false
+      tags: ""
 
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChangeFile = this.handleChangeFile.bind(this);
+    this.handleChangeInput = this.handleChangeInput.bind(this);
     this.fileInput = React.createRef();
 
   }
 
   componentDidMount() {
-    const instance = axios.create({
+    axios.create({
       baseURL: 'http://127.0.0.1:5000'
     });
   }
@@ -61,6 +61,12 @@ class Dashboard extends Component {
     console.log(this.state);
   }
 
+  handleChangeInput(event) {
+    this.setState({tags: event.target.value});
+
+    console.log(this.state.tags);
+  }
+
   async handleSubmit(event) {
     var FileDownload = require('js-file-download');
 
@@ -70,7 +76,8 @@ class Dashboard extends Component {
 
     const formData = new FormData()
 
-    formData.append('file', uploaded_video)
+    formData.append('file', uploaded_video);
+    formData.append('tags', this.state.tags);
 
     this.setState({isProcessing: true});
 
@@ -125,17 +132,28 @@ class Dashboard extends Component {
               <Row>
                 <Col md={12}>
   
-                <form onSubmit={this.handleSubmit} enctype="multipart/form-data">
-                  <label>Por favor, carregar vídeo para anotação.</label>
-                  <input type="file" ref={this.fileInput} />
-  
-                  <Button bsStyle="info" pullRight fill type="submit">
-                    Enviar
-                  </Button>
-                  <div className="clearfix" />
-                  
-                  
-                </form>
+                <div style={{ display: "flex", flexDirection: "center", alignContent: "center", alignItems: "center", justifyContent: "center"}}>
+                  <form onSubmit={this.handleSubmit} enctype="multipart/form-data">
+                    <label>Por favor, escolha um vídeo para nova anotação.</label>
+                    <input type="file" ref={this.fileInput} />
+
+                    <section style={{ marginBottom: "5px", marginTop: "5px"}}>
+                      <label>Entre com tags que descrevem o vídeo: </label>
+          
+                    </section>
+
+                    <input type="text" placeholder="Educação;Esportes;Pessoal;" style={{width: "300px"}} onChange={this.handleChangeInput}/>
+    
+                    <section style={{ marginBottom: "5px", marginTop: "15px"}}>
+                      <Button bsStyle="info" fill type="submit" style={{width: "300px"}}>
+                        Enviar
+                      </Button>
+                    </section>
+                    <div className="clearfix" />
+                    
+                    
+                  </form>
+                </div>
                   
                 </Col> 
               </Row>
@@ -153,7 +171,7 @@ class Dashboard extends Component {
                   <StatsCard
                     bigIcon={<i className="pe-7s-note2 text-success" />}
                     statsText="Anotações"
-                    statsValue="200"
+                    statsValue="26"
                     statsIcon={<i className="fa fa-refresh" />}
                     statsIconText="Atualizar"
                   />
@@ -163,7 +181,7 @@ class Dashboard extends Component {
                   <StatsCard
                     bigIcon={<i className="pe-7s-user text-success" />}
                     statsText="Rostos Encontrados"
-                    statsValue="20"
+                    statsValue="2"
                     statsIcon={<i className="fa fa-refresh" />}
                     statsIconText="Atualizar"
                   />
