@@ -45,14 +45,6 @@ const dashboardRoutes = [
     component: Status,
     layout: "/admin"
   },
-
-  {
-    path: "/videos",
-    name: "Videos",
-    icon: "pe-7s-graph1",
-    component: Videos,
-    layout: "/admin"
-  },
 ];
 
 export default dashboardRoutes;

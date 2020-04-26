@@ -28,19 +28,23 @@ class PreAnnotation extends Component {
         'persons': [],
         'modalShow': false,
         'code': null,
-        'video_code': 11,
+        'video_code': 16,
         'annotations': [],
         'photos': [],
         'options': null,
         'option': null,
         'name': "",
-        'showMessage': false
+        'showMessage': false,
+        'value': 'select',
+        'videoOptions': (<option></option>),
+        'tags': ""
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
     this.loadModal = this.loadModal.bind(this);
     this.confirm = this.confirm.bind(this);
     this.getPhotos = this.getPhotos.bind(this);
+    this.change = this.change.bind(this);
  
   }
 
@@ -60,9 +64,16 @@ class PreAnnotation extends Component {
       baseURL: 'http://127.0.0.1:5000'
     });
 
+    let formData = new FormData();
+
+    formData.append('video', this.state.video_code);
+
+    console.log(formData);
+
     await axios({
-      method: 'GET',
-      url: "/api/annotations/"  
+      method: 'POST',
+      url: "/api/annotations/",
+      data: formData
     })
     .then((response) => {
       this.setState({'annotations': response.data});
@@ -108,6 +119,7 @@ class PreAnnotation extends Component {
       });
     }
     
+    this.loadVideoOptions();
   }
 
   /** Escolhe uma opção na lista */
@@ -242,6 +254,31 @@ class PreAnnotation extends Component {
     return (<div></div>)
   }
 
+  change(event) {
+      this.setState({value: event.target.value});
+
+      this.setState({'photos': []})
+
+      this.componentDidMount();
+  }
+
+  loadVideoOptions = async () => {
+
+    await axios({
+      method: 'GET',
+      url: "/api/videos/"
+    })
+    .then(({data}) => {
+
+    const videoOptions = data.map((video) => 
+      <option value={video[0]}>{video[1]}</option>        
+    )
+
+    this.setState({'videoOptions': videoOptions});
+
+    })
+  }
+
   render() {
 
     const thArray = ["ID", "Video", "Ator", "X", "Y", "W", "H", "Tempo", "Caminho"];
@@ -252,12 +289,30 @@ class PreAnnotation extends Component {
     const listaDeOpcoes = this.state.options;
     const m = this.showMessage();
     const name = this.state.name !== "" ? <Alert variant={"danger"}>{this.state.name}</Alert> : <p></p>;
-
+    const videoOptions = this.state.videoOptions;
+    console.log(videoOptions);
     return (
       <div className="content">
         <Grid fluid>
           <Row>
-            {m}          
+            <Col lg={12} md={12}>
+
+            <Card
+                title="Lista de Vídeos"
+                category="Escolha um vídeo"
+                ctTableFullWidth
+                ctTableResponsive
+                content={
+                  <div style={{marginLeft: "15px"}}>
+                    <select id="lang" onChange={this.change} value={this.state.value}>
+                      {videoOptions}
+                    </select> 
+                  </div>
+                }
+              />
+              
+            </Col>
+            {m}
 
             {listaDeFaces}
 
