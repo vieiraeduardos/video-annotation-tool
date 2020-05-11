@@ -4,15 +4,10 @@ import {
   Grid,
   Row,
   Col,
-  FormGroup,
-  ControlLabel,
-  FormControl,
   Image
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
-import { FormInputs } from "components/FormInputs/FormInputs.jsx";
-import { UserCard } from "components/UserCard/UserCard.jsx";
 import Button from "components/CustomButton/CustomButton.jsx";
 
 import avatar from "assets/img/faces/face-3.jpg";
@@ -74,27 +69,7 @@ class Verification extends Component {
     )
 
 
-    const list2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((response) => 
-      <Image src={avatar} rounded width={50} height={50}/>
-    )
-
-
-    const list3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((response) => 
-      <Image src={avatar} rounded width={50} height={50}/>
-    )
-
-    const list4 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((response) => 
-      <Image src={avatar} rounded width={50} height={50}/>
-    )
-
-    const list5 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((response) => 
-      <Image src={avatar} rounded width={50} height={50}/>
-    )
-
-    const list6 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((response) => 
-      <Image src={avatar} rounded width={50} height={50}/>
-    )
-
+    
     return (
       <div className="content">
         <Grid fluid>

@@ -4,18 +4,13 @@ import {
   Grid,
   Row,
   Col,
-  FormGroup,
-  ControlLabel,
-  FormControl,
   Alert
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
 import { FormInputs } from "components/FormInputs/FormInputs.jsx";
-import { UserCard } from "components/UserCard/UserCard.jsx";
 import Button from "components/CustomButton/CustomButton.jsx";
 
-import avatar from "assets/img/faces/face-3.jpg";
 
 class NewPeople extends Component {
 
@@ -43,7 +38,7 @@ class NewPeople extends Component {
     formData.append('name', name);
     formData.append('email', email);
 
-    const result = await fetch('http://127.0.0.1:5000/api/persons/', {
+    await fetch('http://127.0.0.1:5000/api/persons/', {
         method: 'POST',
         body: formData,
     }).then((data) => {

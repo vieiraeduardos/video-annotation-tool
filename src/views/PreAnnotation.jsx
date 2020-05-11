@@ -18,7 +18,7 @@ import axios from 'axios';
 
 import './styles.css';
 
-import avatar from '../assets/img/faces/eduardo.jpg';
+import avatar from '../assets/img/default-avatar.png';
 
 class PreAnnotation extends Component {
   constructor(props) {
@@ -50,12 +50,50 @@ class PreAnnotation extends Component {
 
   isInside(photos, code) {
     for(var i in photos) {
-      if(photos[i]["actor"] == code) {
+      if(photos[i]["actor"] === code) {
         return i
       }
     }
 
     return 999
+  }
+
+  async getImage(i, annotations) {
+    const formData = new FormData()
+
+      formData.append('path', annotations[i][8])
+
+      await axios({
+        method: 'POST',
+        url: "/api/image/",
+        data: formData,
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        const base64 = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            '',
+          ),
+        );
+
+        var photos = this.state.photos;
+        var actor = annotations[i][2];
+
+        var result = this.isInside(photos, actor);
+
+        if(result === 999) {
+          photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}], name: annotations[i][10]})
+
+          this.setState({photos: photos}) 
+        } else {
+          photos[result]['photos'].push({'source': "data:;base64," + base64});
+
+          this.setState({photos: photos});
+        }
+        
+      });
+
   }
 
   async componentDidMount() {
@@ -83,40 +121,7 @@ class PreAnnotation extends Component {
     const annotations = this.state.annotations;
 
     for (var i in annotations) {
-      const formData = new FormData()
-
-      formData.append('path', annotations[i][8])
-
-      await axios({
-        method: 'POST',
-        url: "/api/image/",
-        data: formData,
-        responseType: 'arraybuffer',
-      })
-      .then((response) => {
-        const base64 = btoa(
-          new Uint8Array(response.data).reduce(
-            (data, byte) => data + String.fromCharCode(byte),
-            '',
-          ),
-        );
-
-        var photos = this.state.photos;
-        var actor = annotations[i][2];
-
-        var result = this.isInside(photos, actor);
-
-        if(result == 999) {
-          photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}], name: annotations[i][10]})
-
-          this.setState({photos: photos}) 
-        } else {
-          photos[result]['photos'].push({'source': "data:;base64," + base64});
-
-          this.setState({photos: photos});
-        }
-        
-      });
+      this.getImage(i, annotations)
     }
     
     this.loadVideoOptions();

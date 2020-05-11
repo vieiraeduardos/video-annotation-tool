@@ -14,7 +14,6 @@ import avatar from 'assets/img/faces/eduardo.jpg';
 
 import 'react-activity/dist/react-activity.css';
 
-import Lottie from 'react-lottie';
 import animation from './animation.gif';
 
 class Dashboard extends Component {
@@ -46,15 +45,6 @@ class Dashboard extends Component {
     });
   }
 
-
-  handleSubmit(event) {
-    event.preventDefault();
-
-    this.setState({file: this.fileInput.current.files[0]});
-    
-    console.log(this.fileInput.current.files[0])
-  }
-
   handleChangeFile(event) {
     this.setState({file: event.target.value});
 
@@ -68,8 +58,6 @@ class Dashboard extends Component {
   }
 
   async handleSubmit(event) {
-    var FileDownload = require('js-file-download');
-
     event.preventDefault();
 
     const uploaded_video = this.fileInput.current.files[0];
@@ -81,7 +69,7 @@ class Dashboard extends Component {
 
     this.setState({isProcessing: true});
 
-    const result = await axios({
+    await axios({
       method: 'POST',
       url: "/api/videos",
       data: formData,

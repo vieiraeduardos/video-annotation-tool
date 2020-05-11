@@ -26,11 +26,11 @@ class Status extends Component {
   }
 
   async componentDidMount() {
-    const instance = axios.create({
+    axios.create({
       baseURL: 'http://127.0.0.1:5000'
     });
 
-    const result = await axios({
+    await axios({
       method: 'GET',
       url: "/api/videos"
     })
@@ -41,13 +41,6 @@ class Status extends Component {
   }
 
   render() {
-
-    const listaDeVideos = this.state.videos.map((video) => 
-      <div>
-        <p>{video[1]}</p>
-      </div>
-    )
-
 
     return (
       <div className="content">

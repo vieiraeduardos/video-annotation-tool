@@ -15,11 +15,11 @@ class Videos extends Component {
     }
 
     async componentDidMount() {
-        const instance = axios.create({
+        axios.create({
           baseURL: 'http://127.0.0.1:5000'
         });
     
-        const result = await axios({
+        await axios({
           method: 'GET',
           url: "/api/videos"
         })
