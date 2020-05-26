@@ -1,78 +1,377 @@
+
 import React, { Component } from "react";
-import { Grid, Row, Col, Table } from "react-bootstrap";
+import {
+  Grid,
+  Row,
+  Col,
+  Image,
+  Modal,
+  Alert
+
+} from "react-bootstrap";
+
+import Button from "components/CustomButton/CustomButton.jsx";
 
 import Card from "components/Card/Card.jsx";
 
-import axios from "axios";
+import axios from 'axios';
+
+import './styles.css';
 
 class Videos extends Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
+ 
+    this.state = {
+        'persons': [],
+        'modalShow': false,
+        'code': null,
+        'video_code': 16,
+        'annotations': [],
+        'photos': [],
+        'options': null,
+        'option': null,
+        'name': "",
+        'showMessage': false,
+        'value': 'select',
+        'videoOptions': (<option></option>),
+        'tags': ""
+    }
+    
+    this.handleChangeInput = this.handleChangeInput.bind(this);
+    this.loadModal = this.loadModal.bind(this);
+    this.confirm = this.confirm.bind(this);
+    this.getPhotos = this.getPhotos.bind(this);
+    this.change = this.change.bind(this);
+    this.confirmCluster = this.confirmCluster.bind(this);
+ 
+  }
 
-        this.state = {
-            videos: []
-        }
+  isInside(photos, code) {
+    for(var i in photos) {
+      if(photos[i]["actor"] === code) {
+        return i
+      }
     }
 
-    async componentDidMount() {
-        axios.create({
-          baseURL: 'http://127.0.0.1:5000'
-        });
+    return 999
+  }
+
+  async getImage(i, annotations) {
+    const formData = new FormData()
+
+      formData.append('path', annotations[i][8])
+
+      await axios({
+        method: 'POST',
+        url: "/api/image/",
+        data: formData,
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        const base64 = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            '',
+          ),
+        );
+
+        var photos = this.state.photos;
+        var actor = annotations[i][2];
+
+        var result = this.isInside(photos, actor);
+
+        if(result === 999) {
+          photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}], name: annotations[i][10]})
+
+          this.setState({photos: photos}) 
+        } else {
+          photos[result]['photos'].push({'source': "data:;base64," + base64});
+
+          this.setState({photos: photos});
+        }
+        
+      });
+
+  }
+
+  /**
+   * Obtem um conjunto de anotações de rostos segundo o código do vídeo.
+   * 
+   */
+  getAnnotationsByVideo = async () => {
+    let formData = new FormData();
+
+    formData.append('video', this.state.video_code);
+
+    await axios({
+      method: 'POST',
+      url: "/api/clusters/annotations",
+      data: formData
+    })
+    .then((response) => {
+      this.setState({'annotations': response.data});
+    });
+  }
+
+  /**
+   * Extrai imagens das anotações do vídeo 
+   * 
+   */
+  async addPhotos() {
+    /** Pegando lista de fotos segundo as anotações */
+    const annotations = this.state.annotations;
+
+    for (var i in annotations) {
+      this.getImage(i, annotations)
+    }
+  }
+
+  async componentDidMount() {
+    /** Definindo URL da API */
+    axios.create({
+      baseURL: 'http://127.0.0.1:5000'
+    });
+
+    await this.getAnnotationsByVideo();
+
+    await this.addPhotos();
     
-        await axios({
-          method: 'GET',
-          url: "/api/videos"
-        })
-        .then(({ data }) => {
-          this.setState({"videos": data});
+    this.loadVideoOptions();
+  }
+
+  /** Escolhe uma opção na lista */
+  chooseOption(person) {
+    this.setState({"option": person[0]});
+    this.setState({"name": person[1]});
     
-        });
-      }
+  }
+
+  /** Pesquisa no DB nomes de pessoas */
+  handleChangeInput = async (event) => {
+    event.preventDefault();
+    /** q guarda o nome da pessoa pesquisada no DB */
+    const q = event.target.value;
+
+    await axios({
+      method: 'GET',
+      url: "/api/persons/" + q
+    })
+    .then((response) => {
+      this.setState({persons: response.data});
+    });
+
+    /** Listando opções de pessoas na pesquisa */
+    const persons = this.state.persons;
+
+    var options = <p>Nenhum resultado encontrado!</p>
+
+    /** Se existir correspondência na pesquisa, mostra as opções */
+    if(persons.length > 0) {
+      
+      options = persons.map((person) => 
+        <li onClick={() => this.chooseOption(person)}>{person[1]}</li>
+      )
+    }
+
+    this.setState({'options': options})
+  }
+
+  loadModal = (actor) => {
+    this.setState({'modalShow': true});
+    this.setState({'code': actor});
+
+  }
+
+  /**
+   * Confirma se todas os rostos no conjunto pertecem a mesma pessoa.
+   * 
+   */
+  confirmCluster(code) {
+    console.log(code);
+  }
+ 
+  getPhotos() {
+    var photos = this.state.photos;
+    var count = [];
+
+    for(var i in photos) {
+      count.push(i);
+    }
+
+    const listaDeImagens = count.map((index) =>
+
+    <Col md={12}>
+      <Card
+        title=""
+        content={
+            <div>
+              <Row>
+                <Col xs={12} md={12}>
+                  {photos[index].photos.map((source) => 
+                    <Image src={source.source} rounded width={60} height={60}/>
+                  )}        
+                </Col>
+              </Row>
+              
+              <Row style={{margin: "10px"}}>
+                  <Col md={5}>
+                    <Button bsStyle="success" onClick={() => this.confirmCluster(photos[index].actor)} pullRight fill type="submit">
+                        Aceitar
+                    </Button>
+                    
+                  </Col>
+                  <Col md={2}>
+                  <Button bsStyle="danger" pullRight fill type="submit">
+                        Negar
+                  </Button>
+                  </Col>
+              </Row>
+              
+              <div className="clearfix" />
+            </div>
+        }
+      />
+    </Col>
+    )
+
+    return listaDeImagens;
+  }
+
+  async confirm() {
+    const option = this.state.option;
+    const actor = this.state.code;
+
+    console.log("OPTION: " + option);
+    console.log("ACTOR: " + actor);
+
+    var formData = new FormData();
+
+    formData.append("option", option);
+    formData.append("actor", actor);
+
+    /** Atualiza pessoa no conjunto de imagens */
+    await axios({
+      method: 'PUT',
+      url: "/api/actors/",
+      data: formData
+    })
+    .then((response) => {
+      this.setState({'modalShow': false});
+
+      this.setState({'showMessage': true});
+
+
+    })
+  }
+
+  showMessage() {
+    console.log(this.state.showMessage)
+    if(this.state.showMessage) {
+      return (
+        <Col lg={12} md={12}>
+          <Alert variant={"danger"}>
+            Anotação realizada com sucesso!
+          </Alert>
+        </Col>
+      );
+    } 
+
+    return (<div></div>)
+  }
+
+  change(event) {
+      this.setState({value: event.target.value});
+
+      this.setState({'photos': []})
+
+      this.componentDidMount();
+  }
+
+  loadVideoOptions = async () => {
+
+    await axios({
+      method: 'GET',
+      url: "/api/videos/"
+    })
+    .then(({data}) => {
+
+    const videoOptions = data.map((video) => 
+      <option value={video[0]}>{video[1]}</option>        
+    )
+
+    this.setState({'videoOptions': videoOptions});
+
+    })
+  }
 
   render() {
 
-    const thArray = ["ID", "Nome"];
-    
-    const tdArray = this.state.videos;
+    const listaDeFaces = this.getPhotos();
+    const listaDeOpcoes = this.state.options;
+    const messageWhenAnnotateFace = this.showMessage();
+    const name = this.state.name !== "" ? <Alert variant={"danger"}>{this.state.name}</Alert> : <p></p>;
+    const videoOptions = this.state.videoOptions;
 
     return (
       <div className="content">
         <Grid fluid>
           <Row>
-            <Col md={12}>
-              <Card
+            <Col lg={12} md={12}>
+
+            <Card
                 title="Lista de Vídeos"
-                category="Lista de vídeos processados"
+                category="Escolha um vídeo"
                 ctTableFullWidth
                 ctTableResponsive
                 content={
-                  <Table striped hover>
-                    <thead>
-                      <tr>
-                        {thArray.map((prop, key) => {
-                          return <th key={key}>{prop}</th>;
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {tdArray.map((prop, key) => {
-                        return (
-                          <tr key={key}>
-                            {prop.map((prop, key) => {
-                              return <td key={key}>{prop}</td>;
-                            })}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </Table>
+                  <div style={{marginLeft: "15px"}}>
+                    <select id="lang" onChange={this.change} value={this.state.value}>
+                      {videoOptions}
+                    </select> 
+                  </div>
                 }
               />
+              
             </Col>
 
+            {messageWhenAnnotateFace}
+
+            {listaDeFaces}
             
           </Row>
         </Grid>
+
+        <Modal
+          show={this.state.modalShow}
+          onHide={() => this.setState({'modalShow': false})}
+          size="lg"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Quem está nas fotos?
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>
+              Escolha uma pessoa na lista abaixo que está representado nas fotos.
+            </p>
+
+            <input type='text' style={{width: "100%", marginBottom: "5px"}} onChange={this.handleChangeInput}/>
+
+            {name}
+
+            <ul id="lista">
+              { listaDeOpcoes }
+            </ul>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.confirm}>Confirmar</Button>
+            <Button onClick={() => this.setState({'modalShow': false})}>Cancelar</Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
