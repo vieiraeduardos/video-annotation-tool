@@ -24,6 +24,7 @@ import Button from "components/CustomButton/CustomButton.jsx";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPenSquare } from '@fortawesome/free-solid-svg-icons'
 
 class PreAnnotation extends Component {
   constructor(props) {
@@ -48,7 +49,8 @@ class PreAnnotation extends Component {
         'formuniversity': "",
         'formname': "",
         'formemail': "",
-        'photoCodeToRemove': null
+        'photoCodeToRemoveOrMove': null,
+        'isMoving': false
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -140,7 +142,7 @@ class PreAnnotation extends Component {
 
       if(result === 999) {
 
-        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], name: annotations[i][11], person: annotations[i][13]})
+        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], name: annotations[i][10], person: annotations[i][13]})
 
         this.setState({photos: photos}) 
       } else {
@@ -238,19 +240,24 @@ class PreAnnotation extends Component {
 
     console.log(code);
 
-    this.setState({"photoCodeToRemove": code});
+    this.setState({"photoCodeToRemoveOrMove": code});
   }
 
   removePhoto = async () => {
-    const photoCodeToRemove = this.state.photoCodeToRemove;
+    const photoCodeToRemoveOrMove = this.state.photoCodeToRemoveOrMove;
 
     await axios({
       method: 'DELETE',
-      url: "/api/images/" + photoCodeToRemove
+      url: "/api/images/" + photoCodeToRemoveOrMove
     })
     .then((response) => {
       window.location.reload(false);
     });
+  }
+
+  movePhoto = async () => {
+    this.setState({"isMoving": true});
+    this.setState({"modalShow": true});
   }
 
   /**
@@ -268,6 +275,11 @@ class PreAnnotation extends Component {
     const listaDeImagens = count.map((index) =>
 
     <Col md={12}>
+      <Button bsStyle="info" pullRight fill onClick={() => this.movePhoto()}>
+        
+        <FontAwesomeIcon icon={faPenSquare} />
+      </Button>
+
       <Button bsStyle="danger" pullRight fill onClick={() => this.removePhoto()}>
         
         <FontAwesomeIcon icon={faTrash} />
@@ -319,27 +331,54 @@ class PreAnnotation extends Component {
    * 
    */
   async confirm() {
-    const option = this.state.option;
-    const actor = this.state.code;
+    if(!this.state.isMoving) {
+      const option = this.state.option;
+      const actor = this.state.code;
 
-    var formData = new FormData();
+      var formData = new FormData();
 
-    formData.append("option", option);
-    formData.append("actor", actor);
+      formData.append("option", option);
+      formData.append("actor", actor);
 
-    /** Atualiza pessoa no conjunto de imagens */
-    await axios({
-      method: 'PUT',
-      url: "/api/actors/",
-      data: formData
-    })
-    .then((response) => {
-      this.setState({'modalShow': false});
+      /** Atualiza pessoa no conjunto de imagens */
+      await axios({
+        method: 'PUT',
+        url: "/api/actors/",
+        data: formData
+      })
+      .then((response) => {
+        this.setState({'modalShow': false});
+        this.setState({'modalSignUpIsVisible': false});
+        this.setState({'showMessage': true});
 
-      this.setState({'showMessage': true});
-    })
+        window.location.reload(false);
+      })
 
-    await this.getPhotosComponent();
+      await this.getPhotosComponent();
+    } else {
+
+      const person = this.state.option;
+      const image = this.state.photoCodeToRemoveOrMove;
+
+      var formData = new FormData();
+
+      formData.append("person", person);
+      formData.append("image", image);
+
+      /** Move imagem */
+      await axios({
+        method: 'PUT',
+        url: "/api/images/",
+        data: formData
+      })
+      .then((response) => {
+        this.setState({'modalShow': false});
+
+        this.setState({'showMessage': true});
+
+        window.location.reload(false);
+      })
+    }
 
   }
 
