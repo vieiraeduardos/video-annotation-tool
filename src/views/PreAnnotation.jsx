@@ -6,7 +6,6 @@ import {
   Col,
   Image,
   Modal,
-  Button,
   Alert
 
 } from "react-bootstrap";
@@ -21,6 +20,11 @@ import './styles.css';
 
 import avatar from '../assets/img/default-avatar.png';
 
+import Button from "components/CustomButton/CustomButton.jsx";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
+
 class PreAnnotation extends Component {
   constructor(props) {
     super(props);
@@ -30,7 +34,7 @@ class PreAnnotation extends Component {
         'modalShow': false,
         'modalSignUpIsVisible': false,
         'code': null,
-        'video_code': 20,
+        'video_code': 12,
         'annotations': [],
         'photos': [],
         'options': null,
@@ -43,7 +47,8 @@ class PreAnnotation extends Component {
         'listaDeFaces': null,
         'formuniversity': "",
         'formname': "",
-        'formemail': ""
+        'formemail': "",
+        'photoCodeToRemove': null
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -133,15 +138,13 @@ class PreAnnotation extends Component {
 
       var result = this.isInside(photos, actor);
 
-
       if(result === 999) {
-        console.log(annotations[i][13])
 
-        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64}], name: annotations[i][11], person: annotations[i][13]})
+        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], name: annotations[i][11], person: annotations[i][13]})
 
         this.setState({photos: photos}) 
       } else {
-        photos[result]['photos'].push({'source': "data:;base64," + base64});
+        photos[result]['photos'].push({'source': "data:;base64," + base64,  'image_id': annotations[i][0]});
 
         this.setState({photos: photos});
       }
@@ -228,6 +231,28 @@ class PreAnnotation extends Component {
     await this.confirm();
   }
 
+  selectPhoto = (code) => {
+    var element = document.getElementById(code);
+
+    element.style.border = "thick solid red"
+
+    console.log(code);
+
+    this.setState({"photoCodeToRemove": code});
+  }
+
+  removePhoto = async () => {
+    const photoCodeToRemove = this.state.photoCodeToRemove;
+
+    await axios({
+      method: 'DELETE',
+      url: "/api/images/" + photoCodeToRemove
+    })
+    .then((response) => {
+      window.location.reload(false);
+    });
+  }
+
   /**
    * Montar o componente com as imagens do banco de dados
    * 
@@ -243,6 +268,10 @@ class PreAnnotation extends Component {
     const listaDeImagens = count.map((index) =>
 
     <Col md={12}>
+      <Button bsStyle="danger" pullRight fill onClick={() => this.removePhoto()}>
+        
+        <FontAwesomeIcon icon={faTrash} />
+      </Button>
       <Card
         title=""
         content={
@@ -250,8 +279,8 @@ class PreAnnotation extends Component {
             <Row>
               <Col xs={12} md={12}>
                 {photos[index].photos.map((source) => 
-                  <Image src={source.source} rounded width={60} height={60}/>
-                )}        
+                  <Image id={source.image_id} onClick={() => this.selectPhoto(source.image_id)} className="faces" src={source.source} rounded width={60} height={60}/>
+                )}
               </Col>
             </Row>
 
@@ -263,11 +292,11 @@ class PreAnnotation extends Component {
 
             <Row>
               <div style={{ display: "flex", flexDirection: "center", alignContent: "center", alignItems: "center", justifyContent: "center"}}>
-                <Button bsStyle="success" onClick={() => this.chooseYes([photos[index].person, photos[index].name, photos[index].actor])} type="submit">
+                <Button fill bsStyle="success" onClick={() => this.chooseYes([photos[index].person, photos[index].name, photos[index].actor])} type="submit">
                   Sim
                 </Button>
 
-                <Button bsStyle="danger"  type="submit" onClick={() => this.loadModal(photos[index].actor)}>
+                <Button fill bsStyle="danger"  type="submit" onClick={() => this.loadModal(photos[index].actor)}>
                   Não
                 </Button>
               </div>
@@ -297,8 +326,6 @@ class PreAnnotation extends Component {
 
     formData.append("option", option);
     formData.append("actor", actor);
-
-    console.log(this.state)
 
     /** Atualiza pessoa no conjunto de imagens */
     await axios({
