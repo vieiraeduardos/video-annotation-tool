@@ -8,31 +8,16 @@ import Videos from "views/Videos.jsx";
 const dashboardRoutes = [
   {
     path: "/dashboard",
-    name: "Painel",
+    name: "Início",
     icon: "pe-7s-graph",
     component: Dashboard,
     layout: "/admin"
   },
 
-  {
-    path: "/newpeople",
-    name: "Novo Ator",
-    icon: "pe-7s-add-user",
-    component: NewPeople,
-    layout: "/admin"
-  },
-
-  {
-    path: "/verification",
-    name: "Verificação",
-    icon: "pe-7s-check",
-    component: Verification,
-    layout: "/admin"
-  },
 
   {
     path: "/preannotation",
-    name: "Pré-anotação",
+    name: "Pré-anotação de faces",
     icon: "pe-7s-link",
     component: PreAnnotation,
     layout: "/admin"
@@ -46,13 +31,7 @@ const dashboardRoutes = [
     layout: "/admin"
   },
 
-  {
-    path: "/videos",
-    name: "Videos",
-    icon: "pe-7s-graph1",
-    component: Videos,
-    layout: "/admin"
-  },
+  
 ];
 
 export default dashboardRoutes;

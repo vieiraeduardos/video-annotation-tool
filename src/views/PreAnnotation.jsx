@@ -50,7 +50,8 @@ class PreAnnotation extends Component {
         'formname': "",
         'formemail': "",
         'photoCodeToRemoveOrMove': null,
-        'isMoving': false
+        'isMoving': false,
+        'profile_photo': []
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -80,7 +81,6 @@ class PreAnnotation extends Component {
 
     this.getPhotosComponent();
 
-    console.log("OK")
   }
 
   isInside(photos, code) {
@@ -112,12 +112,50 @@ class PreAnnotation extends Component {
     });
   }
 
+  get_profile_photo = async () => {
+    const photos = this.state.photos;
+
+    console.log(photos);
+
+    for (var i in photos) {
+      let formData = new FormData()
+
+      formData.append('path', photos[i].profile_photo)
+
+      await axios({
+        method: 'POST',
+        url: "/api/image/",
+        data: formData,
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        var base64 = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            '',
+          ),
+        );
+
+        console.log("Eduardo" + base64)
+        console.log("--------------------")
+
+        var vetor = this.state.profile_photo;
+
+        vetor.push("data:;base64," + base64);
+
+        this.setState({"profile_photo": vetor})
+        
+      });
+    }
+    
+  }
+
   /**
    * Obtem uma imagem do banco de dados
    *  
    */
   async getImage(i, annotations) {
-    const formData = new FormData()
+    let formData = new FormData()
 
     formData.append('path', annotations[i][8])
 
@@ -142,11 +180,11 @@ class PreAnnotation extends Component {
 
       if(result === 999) {
 
-        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], name: annotations[i][10], person: annotations[i][13]})
+        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], 'profile_photo': annotations[i][16], 'name': annotations[i][10], person: annotations[i][13]});
 
-        this.setState({photos: photos}) 
+        this.setState({photos: photos})
       } else {
-        photos[result]['photos'].push({'source': "data:;base64," + base64,  'image_id': annotations[i][0]});
+        photos[result]['photos'].push({'source': "data:;base64," + base64,  'image_id': annotations[i][0], 'profile_photo': annotations[i][16]});
 
         this.setState({photos: photos});
       }
@@ -272,6 +310,10 @@ class PreAnnotation extends Component {
       count.push(i);
     }
 
+    await this.get_profile_photo();
+
+    //console.log(this.state.profile_photo)
+    
     const listaDeImagens = count.map((index) =>
 
     <Col md={12}>
@@ -299,7 +341,7 @@ class PreAnnotation extends Component {
             <Row style={{margin: "10px"}}>
               <div style={{ display: "flex", flexDirection: "center", alignContent: "center", alignItems: "center", justifyContent: "center"}}>
                 <h4>Este é o {photos[index].name} <img style={{width: "30px", heigh: "30px", borderRadius: "50%", marginLeft: "auto"}} src={avatar} alt="loading..."/>?</h4>
-              </div>              
+              </div>    
             </Row>
 
             <Row>
