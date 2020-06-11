@@ -51,7 +51,9 @@ class PreAnnotation extends Component {
         'formemail': "",
         'photoCodeToRemoveOrMove': null,
         'isMoving': false,
-        'profile_photo': []
+        'profile_photo': [],
+
+        'vetor': []
     }
     
     this.handleChangeInput = this.handleChangeInput.bind(this);
@@ -115,7 +117,7 @@ class PreAnnotation extends Component {
   get_profile_photo = async () => {
     const photos = this.state.photos;
 
-    console.log(photos);
+    console.log(this.state.vetor);
 
     for (var i in photos) {
       let formData = new FormData()
@@ -136,12 +138,12 @@ class PreAnnotation extends Component {
           ),
         );
 
-        console.log("Eduardo" + base64)
+        console.log("Eduardo \n" + base64)
         console.log("--------------------")
 
         var vetor = this.state.profile_photo;
 
-        vetor.push("data:;base64," + base64);
+        vetor.unshift("data:;base64," + base64);
 
         this.setState({"profile_photo": vetor})
         
@@ -180,11 +182,20 @@ class PreAnnotation extends Component {
 
       if(result === 999) {
 
-        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], 'profile_photo': annotations[i][16], 'name': annotations[i][10], person: annotations[i][13]});
+        console.log(i);
+
+        var profile = String(annotations[i][16]);
+
+        var vetor = this.state.vetor;
+        vetor.push(annotations[i][16]);
+
+        this.setState({'vetor': vetor})
+
+        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], 'profile_photo': profile, 'name': annotations[i][10], person: annotations[i][13]});
 
         this.setState({photos: photos})
       } else {
-        photos[result]['photos'].push({'source': "data:;base64," + base64,  'image_id': annotations[i][0], 'profile_photo': annotations[i][16]});
+        photos[result]['photos'].push({'source': "data:;base64," + base64,  'image_id': annotations[i][0]});
 
         this.setState({photos: photos});
       }
@@ -202,7 +213,7 @@ class PreAnnotation extends Component {
     const annotations = this.state.annotations;
 
     for (var i in annotations) {
-      this.getImage(i, annotations)
+      await this.getImage(i, annotations)
     }
   }
 
@@ -340,7 +351,7 @@ class PreAnnotation extends Component {
 
             <Row style={{margin: "10px"}}>
               <div style={{ display: "flex", flexDirection: "center", alignContent: "center", alignItems: "center", justifyContent: "center"}}>
-                <h4>Este é o {photos[index].name} <img style={{width: "30px", heigh: "30px", borderRadius: "50%", marginLeft: "auto"}} src={avatar} alt="loading..."/>?</h4>
+                <h4>Este é o {photos[index].name} <img style={{width: "30px", heigh: "30px", borderRadius: "50%", marginLeft: "auto"}} src={this.state.profile_photo[index]} alt="loading..."/>?</h4>
               </div>    
             </Row>
 
