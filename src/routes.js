@@ -1,9 +1,6 @@
 import Dashboard from "views/Dashboard.jsx";
-import NewPeople from "views/NewPeople.jsx";
-import Verification from "views/Verification.jsx";
 import PreAnnotation from "views/PreAnnotation.jsx";
 import Status from "views/Status.jsx";
-import Videos from "views/Videos.jsx";
 
 const dashboardRoutes = [
   {
@@ -13,7 +10,6 @@ const dashboardRoutes = [
     component: Dashboard,
     layout: "/admin"
   },
-
 
   {
     path: "/preannotation",

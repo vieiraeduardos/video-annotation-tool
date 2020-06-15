@@ -18,8 +18,6 @@ import axios from 'axios';
 
 import './styles.css';
 
-import avatar from '../assets/img/default-avatar.png';
-
 import Button from "components/CustomButton/CustomButton.jsx";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -35,7 +33,7 @@ class PreAnnotation extends Component {
         'modalShow': false,
         'modalSignUpIsVisible': false,
         'code': null,
-        'video_code': 12,
+        'video_code': 20,
         'annotations': [],
         'photos': [],
         'options': null,
@@ -114,15 +112,22 @@ class PreAnnotation extends Component {
     });
   }
 
+
+
   get_profile_photo = async () => {
     const photos = this.state.photos;
 
-    console.log(this.state.vetor);
+    console.log(photos);
+    var urls = [];
 
-    for (var i in photos) {
+    for (let i in photos) {
+      urls.push(photos[i].profile_photo);
+    }
+
+    for (let i in urls) {
       let formData = new FormData()
 
-      formData.append('path', photos[i].profile_photo)
+      formData.append('path', urls[i]);
 
       await axios({
         method: 'POST',
@@ -138,12 +143,12 @@ class PreAnnotation extends Component {
           ),
         );
 
-        console.log("Eduardo \n" + base64)
-        console.log("--------------------")
+        //console.log("Eduardo \n" + base64)
+        //console.log("--------------------")
 
         var vetor = this.state.profile_photo;
 
-        vetor.unshift("data:;base64," + base64);
+        vetor.push("data:;base64," + base64);
 
         this.setState({"profile_photo": vetor})
         
@@ -263,6 +268,7 @@ class PreAnnotation extends Component {
    * 
    */
   loadModal = (actor) => {
+    console.log(actor);
     this.setState({'modalShow': true});
     this.setState({'code': actor});
 
@@ -271,7 +277,7 @@ class PreAnnotation extends Component {
   loadModalSignUp = (actor) => {
     this.setState({'modalShow': false});
     this.setState({'modalSignUpIsVisible': true});
-    this.setState({'code': actor});
+    this.setState({'code': this.state.code});
   }
 
   chooseYes = async (person) => {
@@ -388,7 +394,7 @@ class PreAnnotation extends Component {
       const option = this.state.option;
       const actor = this.state.code;
 
-      var formData = new FormData();
+      let formData = new FormData();
 
       formData.append("option", option);
       formData.append("actor", actor);
@@ -413,7 +419,7 @@ class PreAnnotation extends Component {
       const person = this.state.option;
       const image = this.state.photoCodeToRemoveOrMove;
 
-      var formData = new FormData();
+      let formData = new FormData();
 
       formData.append("person", person);
       formData.append("image", image);
@@ -480,12 +486,15 @@ class PreAnnotation extends Component {
   }
 
   async signUp() {
-    const {formname, formemail} = this.state;
+    const {formname, formemail, code} = this.state;
 
     const formData  = new FormData();
 
     formData.append('name', formname);
     formData.append('email', formemail);
+    formData.append('actor', code);
+
+    console.log(code)
 
     await fetch('http://127.0.0.1:5000/api/persons/', {
         method: 'POST',

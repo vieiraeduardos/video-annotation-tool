@@ -71,7 +71,7 @@ class Dashboard extends Component {
 
     await axios({
       method: 'POST',
-      url: "/api/videos",
+      url: "/api/v2/videos/",
       data: formData,
       responseType: 'arraybuffer',
       headers: {
