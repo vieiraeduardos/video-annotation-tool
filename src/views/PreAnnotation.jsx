@@ -33,7 +33,7 @@ class PreAnnotation extends Component {
         'modalShow': false,
         'modalSignUpIsVisible': false,
         'code': null,
-        'video_code': 20,
+        'video_code': 12,
         'annotations': [],
         'photos': [],
         'options': null,
@@ -50,7 +50,6 @@ class PreAnnotation extends Component {
         'photoCodeToRemoveOrMove': null,
         'isMoving': false,
         'profile_photo': [],
-
         'vetor': []
     }
     
@@ -99,8 +98,9 @@ class PreAnnotation extends Component {
    */
   getAnnotationsByVideo = async () => {
     let formData = new FormData();
+    var url_atual = window.location.href;
 
-    formData.append('video', this.state.video_code);
+    formData.append('video', url_atual.split("/")[5]);
 
     await axios({
       method: 'POST',
@@ -461,11 +461,9 @@ class PreAnnotation extends Component {
   change(event) {
       this.setState({value: event.target.value});
 
-      this.setState({'photos': []})
+      window.location.replace("http://localhost:3000/admin/preannotation/" + event.target.value);
 
-      this.componentDidMount();
-
-      console.log(event.target.value)
+      console.log("CODE VIDEO" + event.target.value)
   }
 
   loadVideoOptions = async () => {
