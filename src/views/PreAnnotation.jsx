@@ -189,14 +189,14 @@ class PreAnnotation extends Component {
 
         console.log(i);
 
-        var profile = String(annotations[i][16]);
+        var profile = String(annotations[i][17]);
 
         var vetor = this.state.vetor;
-        vetor.push(annotations[i][16]);
+        vetor.push(annotations[i][17]);
 
         this.setState({'vetor': vetor})
 
-        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], 'profile_photo': profile, 'name': annotations[i][10], person: annotations[i][13]});
+        photos.push({actor: actor, photos: [{'source': "data:;base64," + base64, 'image_id': annotations[i][0]}], 'profile_photo': profile, 'name': annotations[i][11], person: annotations[i][14]});
 
         this.setState({photos: photos})
       } else {

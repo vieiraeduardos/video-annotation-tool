@@ -8,14 +8,10 @@ import {
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
-import Button from "components/CustomButton/CustomButton.jsx";
 
 import avatar from "assets/img/faces/face-3.jpg";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck} from '@fortawesome/free-solid-svg-icons'
-import { faTimes} from '@fortawesome/free-solid-svg-icons'
-
+import axios from "axios";
 
 class Verification extends Component {
 
@@ -23,98 +19,114 @@ class Verification extends Component {
       super(props);
 
       this.state = {
-          name: "",
-          email: ""
+        personsList: null,
+        listaDeFaces: null
+
       }
-
-      this.handleSubmit = this.handleSubmit.bind(this);
-      this.handleChangeName = this.handleChangeName.bind(this);
-      this.handleChangeEmail = this.handleChangeEmail.bind(this);
-      this.signUp = this.signUp.bind(this);
- 
   }
 
-  signUp() {
-    const {name, email} = this.state;
+  async componentDidMount() {
+    /** Definindo URL da API */
+    axios.create({
+      baseURL: 'http://127.0.0.1:5000'
+    });
 
-    const formData  = new FormData();
+    await this.loadPersonsList();
+    await this.loadProfilePhotos();
+    await this.mountView();
 
-    formData.append('name', name);
-    formData.append('email', email);
-
-    fetch('http://34.50.159.150/actors', {
-      method: 'POST',
-      body: formData
-     })
   }
 
-  handleChangeName(event) {
-    this.setState({name: event.target.value});
+  async mountView() {
+    var personsList = this.state.personsList;
+    var count = [];
+
+    for(var i in personsList) {
+      count.push(i);
+    }
+    
+    const listaDeImagens = count.map((index) =>
+      <Col xs={4} md={4} style={{marginBottom: "30px"}}>
+        <a href={"http://localhost:3000/admin/links/" + personsList[index][0]}>
+          <Image id={personsList[index][3]} onClick={() => console.log("OK")} className="faces" src={personsList[index][3]} style={{border: "thick solid green", width: "100px", heigh: "100px", borderRadius: "50%", marginLeft: "auto"}}/>
+        </a>
+      </Col>
+    )
+
+    this.setState({"listaDeFaces": listaDeImagens});
   }
 
-  handleChangeEmail(event) {
-    this.setState({email: event.target.value});
+
+  loadProfilePhotos = async () => {
+    axios.create({
+      baseURL: 'http://127.0.0.1:5000'
+    });
+    let personsList = this.state.personsList;
+
+    for (let i in personsList) {
+      let formData = new FormData();
+
+      formData.append('path', personsList[i][3])
+
+      await axios({
+        method: 'POST',
+        url: "/api/image/",
+        data: formData,
+        responseType: 'arraybuffer',
+      })
+      .then((response) => {
+        const base64 = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            '',
+          ),
+        );
+
+        let source = "data:;base64," + base64;
+
+        personsList[i][3] = source;
+
+        this.setState({"personsList": personsList})
+      })
+    }
+
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
-
-    this.signUp();
+  loadPersonsList = async () => {
+    await axios({
+      method: 'GET',
+      url: "/api/persons/"
+    })
+    .then((response) => {
+      this.setState({'personsList': response.data});
+    });
   }
 
   render() {
 
-    const list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((response) => 
-      <Image src={avatar} rounded width={60} height={60}/>
-    )
+    const {listaDeFaces} = this.state;
 
-
-    
     return (
       <div className="content">
         <Grid fluid>
           <Row>
-            <Col md={12}>
-              <Card
-                title="Essas imagens representam a mesma pessoa?"
-                content={
-                  <form onSubmit={this.handleSubmit}>
-                    
-                    <Row>
-                      <Col xs={6} md={12}>
-                          {list1}
-                          {list1}
-                          {list1}
-                          {list1}
-                          {list1}
-                          {list1}
-                          {list1}
-                          {list1}
-                          {list1}
-                      </Col>
-                    </Row>
 
-                    
-                    <Row>
-                        <Col md={5}>
-                          <Button bsStyle="success" pullRight fill type="submit">
-                              Aceitar
-                              <FontAwesomeIcon icon={faCheck} />
-                          </Button>
-                          
-                        </Col>
-                        <Col md={2}>
-                        <Button bsStyle="danger" pullRight fill type="submit">
-                              Negar
-                            <FontAwesomeIcon icon={faTimes} />
-                        </Button>
-                        </Col>
-                    </Row>
-                    <div className="clearfix" />
-                  </form>
-                }
-              />
-            </Col>
+          <Col md={12}>
+      
+            <Card
+              title="Veja abaixo lista de pessoas cadastradas"
+              content={
+                <div>
+                  <Row>
+                      {listaDeFaces}
+                  </Row>          
+                  
+                  <div className="clearfix" />
+                </div>
+              }
+            />
+          </Col>
+          
             
           </Row>
         </Grid>
