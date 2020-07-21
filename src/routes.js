@@ -32,15 +32,14 @@ const dashboardRoutes = [
   {
     path: "/verification",
     name: "Grupos",
-    icon: "pe-7s-graph1",
+    icon: "pe-7s-users",
     component: Verification,
     layout: "/admin"
   },
 
   {
     path: "/links",
-    name: "Links",
-    icon: "pe-7s-graph1",
+    
     component: Link,
     layout: "/admin"
   },

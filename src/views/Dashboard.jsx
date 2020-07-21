@@ -36,6 +36,7 @@ class Dashboard extends Component {
     this.handleChangeFile = this.handleChangeFile.bind(this);
     this.handleChangeInput = this.handleChangeInput.bind(this);
     this.fileInput = React.createRef();
+    this.fileInputImport = React.createRef();
 
   }
 
@@ -97,6 +98,34 @@ class Dashboard extends Component {
 
   }
 
+  handleSubmitImport = async (event) => {
+    event.preventDefault();
+
+    const uploaded_file = this.fileInputImport.current.files[0];
+
+    const formData = new FormData()
+
+    formData.append('file', uploaded_file);
+
+    this.setState({isProcessing: true});
+
+    await axios({
+      method: 'POST',
+      url: "/api/imports/",
+      data: formData,
+      responseType: 'arraybuffer',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    })
+    .then(({ data }) => {
+      this.setState({isProcessing: false});
+    });
+
+    this.setState({isLoading: true})
+
+  }
+
   render() {
     const {isLoading, isProcessing} = this.state;
 
@@ -124,17 +153,33 @@ class Dashboard extends Component {
                   <form onSubmit={this.handleSubmit} enctype="multipart/form-data">
                     <label>Por favor, escolha um vídeo para nova anotação.</label>
                     <input type="file" ref={this.fileInput} />
-
-                    <section style={{ marginBottom: "5px", marginTop: "5px"}}>
-                      <label>Entre com tags que descrevem o vídeo: </label>
-          
-                    </section>
-
-                    <input type="text" placeholder="Educação;Esportes;Pessoal;" style={{width: "300px"}} onChange={this.handleChangeInput}/>
     
                     <section style={{ marginBottom: "5px", marginTop: "15px"}}>
                       <Button bsStyle="info" fill type="submit" style={{width: "300px"}}>
                         Enviar
+                      </Button>
+                    </section>
+                    <div className="clearfix" />
+                    
+                    
+                  </form>
+                </div>
+                  
+                </Col> 
+                
+              </Row>
+
+              <Row>
+                <Col md={12}>
+  
+                <div style={{ display: "flex", flexDirection: "center", alignContent: "center", alignItems: "center", justifyContent: "center"}}>
+                  <form onSubmit={this.handleSubmitImport} enctype="multipart/form-data">
+                    <label>Ou importe um arquivo .pkl</label>
+                    <input type="file" ref={this.fileInputImport} />
+    
+                    <section style={{ marginBottom: "5px", marginTop: "15px"}}>
+                      <Button bsStyle="info" fill type="submit" style={{width: "300px"}}>
+                        Importar
                       </Button>
                     </section>
                     <div className="clearfix" />

@@ -63,8 +63,8 @@ class Links extends Component {
     }
     
     const listaDeImagens = count.map((index) =>
-      <Col xs={4} md={4} style={{marginBottom: "30px"}}>
-        <Image  id={annotations[index][0]} onClick={() => this.selectPhoto(annotations[index][0])} className="faces" src={annotations[index][2]} style={{border: "thick solid green", width: "100px", heigh: "100px", borderRadius: "50%", marginLeft: "auto"}}/>
+      <Col xs={1} md={1} style={{margin: "20px"}}>
+        <Image  id={annotations[index][0]} onClick={() => this.selectPhoto(annotations[index][0])} className="faces" src={annotations[index][2]} style={{border: "thick solid green", width: "100px", heigh: "100px", marginLeft: "auto"}} rounded/>
       </Col>
     )
 
@@ -161,7 +161,7 @@ class Links extends Component {
           <Col md={12}>
       
             <Card
-              title="Selecione abaixo as anotações, caso estejam erradas, e confirme."
+              title="Select the faces centroids below, if they are wrong, and confirm."
               content={
                 <div>
                   <Row>

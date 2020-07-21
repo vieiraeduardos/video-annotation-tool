@@ -8,8 +8,7 @@ import {
 } from "react-bootstrap";
 
 import { Card } from "components/Card/Card.jsx";
-
-import avatar from "assets/img/faces/face-3.jpg";
+import Button from "components/CustomButton/CustomButton.jsx";
 
 import axios from "axios";
 
@@ -46,9 +45,9 @@ class Verification extends Component {
     }
     
     const listaDeImagens = count.map((index) =>
-      <Col xs={4} md={4} style={{marginBottom: "30px"}}>
+      <Col xs={1} md={1} style={{margin: "20px"}}>
         <a href={"http://localhost:3000/admin/links/" + personsList[index][0]}>
-          <Image id={personsList[index][3]} onClick={() => console.log("OK")} className="faces" src={personsList[index][3]} style={{border: "thick solid green", width: "100px", heigh: "100px", borderRadius: "50%", marginLeft: "auto"}}/>
+          <Image id={personsList[index][3]} onClick={() => console.log("OK")} className="faces" src={personsList[index][3]} style={{border: "thick solid green", width: "100px", heigh: "100px"}} rounded/>
         </a>
       </Col>
     )
@@ -114,11 +113,16 @@ class Verification extends Component {
           <Col md={12}>
       
             <Card
-              title="Veja abaixo lista de pessoas cadastradas"
+              title="See list of groups found below"
               content={
                 <div>
                   <Row>
-                      {listaDeFaces}
+                  <div style={{ marginRight: "20px", marginBottom: "50px"}}>
+                      <Button bsStyle="success" pullRight fill onClick={() => window.location.replace("http://127.0.0.1:5000/api/reports/csv")}>
+                        Export
+                      </Button>
+                    </div>
+                    {listaDeFaces}
                   </Row>          
                   
                   <div className="clearfix" />
