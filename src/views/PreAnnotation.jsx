@@ -461,7 +461,7 @@ class PreAnnotation extends Component {
   change(event) {
       this.setState({value: event.target.value});
 
-      window.location.replace("http://localhost:3000/admin/preannotation/" + event.target.value);
+      window.location.replace("http://localhost:3000/admin/faceannotation/" + event.target.value);
 
       console.log("CODE VIDEO" + event.target.value)
   }
