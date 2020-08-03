@@ -1,4 +1,4 @@
-# Projeto VAT
+# VideoAnnotator
 Video Annotation Tool
 
 The VAT Project aims to develop a tool for automatic annotation of videos for the Telemídia laboratory of the Pontifical Catholic University.

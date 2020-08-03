@@ -100,7 +100,7 @@ class PreAnnotation extends Component {
     let formData = new FormData();
     var url_atual = window.location.href;
 
-    formData.append('video', url_atual.split("/")[5]);
+    formData.append('video', url_atual.split("/")[5] ? url_atual.split("/")[5] : 0);
 
     await axios({
       method: 'POST',

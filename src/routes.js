@@ -1,6 +1,6 @@
 import Dashboard from "views/Dashboard.jsx";
 import PreAnnotation from "views/PreAnnotation.jsx";
-import Status from "views/Status.jsx";
+import AnnotateDescriptionToScenes from "views/AnnotateDescriptionToScenes.jsx";
 import Verification from "views/Verification.jsx";
 import Link from "views/Links.jsx";
 
@@ -14,18 +14,18 @@ const dashboardRoutes = [
   },
 
   {
-    path: "/preannotation",
-    name: "Anotação de faces",
+    path: "/faceannotation/",
+    name: "Anotar rostos",
     icon: "pe-7s-link",
     component: PreAnnotation,
     layout: "/admin"
   },
 
   {
-    path: "/status",
-    name: "Estatísticas",
-    icon: "pe-7s-graph1",
-    component: Status,
+    path: "/sceneannotation/",
+    name: "Anotar trechos",
+    icon: "pe-7s-link",
+    component: AnnotateDescriptionToScenes,
     layout: "/admin"
   },
 
@@ -39,7 +39,6 @@ const dashboardRoutes = [
 
   {
     path: "/links",
-    
     component: Link,
     layout: "/admin"
   },

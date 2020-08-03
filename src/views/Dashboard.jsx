@@ -4,7 +4,6 @@ import { Grid, Row, Col } from "react-bootstrap";
 import "../../node_modules/video-react/dist/video-react.css";
 import Button from 'components/CustomButton/CustomButton.jsx';
 
-import { StatsCard } from "components/StatsCard/StatsCard.jsx";
 import { UserCard } from "components/UserCard/UserCard.jsx";
 import axios from 'axios';
 
@@ -113,7 +112,6 @@ class Dashboard extends Component {
       method: 'POST',
       url: "/api/imports/",
       data: formData,
-      responseType: 'arraybuffer',
       headers: {
         'Content-Type': 'multipart/form-data',
       }
@@ -200,29 +198,6 @@ class Dashboard extends Component {
             <Grid fluid>
   
               <Row>
-              <Col lg={4} sm={4}>
-                  <StatsCard
-                    bigIcon={<i className="pe-7s-note2 text-success" />}
-                    statsText="Anotações"
-                    statsValue="26"
-                    statsIcon={<i className="fa fa-refresh" />}
-                    statsIconText="Atualizar"
-                  />
-                </Col>
-  
-                <Col lg={8} sm={8}>
-                  <StatsCard
-                    bigIcon={<i className="pe-7s-user text-success" />}
-                    statsText="Rostos Encontrados"
-                    statsValue="2"
-                    statsIcon={<i className="fa fa-refresh" />}
-                    statsIconText="Atualizar"
-                  />
-                </Col>
-      
-              </Row>
-  
-              <Row>
                 <Col lg={12} sm={12}>
                 <UserCard
                     bgImage="https://ununsplash.imgix.net/photo-1431578500526-4d9613015464?fit=crop&fm=jpg&h=300&q=75&w=400"
@@ -238,21 +213,7 @@ class Dashboard extends Component {
                               </span>
                           </Col>
                         </Row>
-                        <Row>
-                          <Col lg={12} sm={12}>
-                              <span>
-                                Opções
-                              </span>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col lg={3} sm={3}></Col>
-                          <Col lg={6} sm={6}>
-                              <Button bsStyle="info" round block fill type="submit">
-                                <a download="annotations.zip" href={this.state.href} style={{ 'color': "white" }}>Baixar</a>
-                              </Button>
-                            </Col>
-                        </Row>
+                        
                       </div>
                     }
                     socials={
