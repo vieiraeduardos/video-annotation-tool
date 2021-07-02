@@ -1,6 +1,6 @@
 import Dashboard from "views/Dashboard.jsx";
 import PreAnnotation from "views/PreAnnotation.jsx";
-import AnnotateDescriptionToScenes from "views/AnnotateDescriptionToScenes.jsx";
+//import AnnotateDescriptionToScenes from "views/AnnotateDescriptionToScenes.jsx";
 import Verification from "views/Verification.jsx";
 import Link from "views/Links.jsx";
 
@@ -18,14 +18,6 @@ const dashboardRoutes = [
     name: "Anotar rostos",
     icon: "pe-7s-link",
     component: PreAnnotation,
-    layout: "/admin"
-  },
-
-  {
-    path: "/sceneannotation/",
-    name: "Anotar trechos",
-    icon: "pe-7s-link",
-    component: AnnotateDescriptionToScenes,
     layout: "/admin"
   },
 

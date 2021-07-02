@@ -167,28 +167,7 @@ class Dashboard extends Component {
                 
               </Row>
 
-              <Row>
-                <Col md={12}>
-  
-                <div style={{ display: "flex", flexDirection: "center", alignContent: "center", alignItems: "center", justifyContent: "center"}}>
-                  <form onSubmit={this.handleSubmitImport} enctype="multipart/form-data">
-                    <label>Ou importe um arquivo .pkl</label>
-                    <input type="file" ref={this.fileInputImport} />
-    
-                    <section style={{ marginBottom: "5px", marginTop: "15px"}}>
-                      <Button bsStyle="info" fill type="submit" style={{width: "300px"}}>
-                        Importar
-                      </Button>
-                    </section>
-                    <div className="clearfix" />
-                    
-                    
-                  </form>
-                </div>
-                  
-                </Col> 
-              </Row>
-    
+              
             </Grid>
           </div>
         )
