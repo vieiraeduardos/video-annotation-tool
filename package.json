@@ -10,7 +10,7 @@
     "bootstrap": "^3.3.7",
     "chartist": "0.10.1",
     "js-file-download": "^0.4.11",
-    "node-sass": "4.14.1",
+    "node-sass": "7.0.0",
     "react": "16.8.6",
     "react-activity": "^1.2.2",
     "react-bootstrap": "^0.32.4",
